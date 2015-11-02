@@ -2,10 +2,10 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask
+from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
+from model import connect_to_db, db, User
 
 
 app = Flask(__name__)
@@ -20,9 +20,48 @@ app.jinja_env.undefined = StrictUndefined
 
 @app.route('/')
 def index():
-    """Homepage."""
+    """Homepage with registration form and login link"""
 
-    return "<html><body>Learndo</body></html>"
+    return render_template("register_form.html")
+
+
+@app.route('/register', methods=['POST'])
+def register_process():
+    """Process registration."""
+
+    # Get form variables
+    first = request.form.get("first")
+    last = request.form.get("last")
+    preferred = request.form.get("preferred")
+    email = request.form.get("email")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    school = request.form.get("school")
+    teacher = request.form.get("teacher")
+
+    print teacher
+
+    if preferred == "":
+        preferred = first + " " + last
+
+    new_teacher = User(is_teacher=teacher,
+                       username=username,
+                       password=password,
+                       email=email,
+                       first_name=first,
+                       last_name=last,
+                       display_name=preferred,
+                       school=school)
+
+    db.session.add(new_teacher)
+    db.session.commit()
+
+    session["user_id"] = new_teacher.user_id
+
+    flash("Your teacher account has been created with the username {} and password {}".format(username, password))
+    
+    return redirect("/")
+
 
 
 if __name__ == "__main__":

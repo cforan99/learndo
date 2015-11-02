@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Register as a Teacher</h2>
+
+<form action="/register" method="POST">
+  <fieldset>
+    <div>
+        <label>
+            First name: 
+            <input type="text" name="first" required>
+        </label>
+    </div>
+
+    <div>
+        <label>
+            Last name: 
+            <input type="text" name="last" required>
+        </label>
+    </div>
+
+    <div>
+        <label>
+            Display name: 
+            <input type="text" name="preferred" placeholder="Ms. Frizz">
+        </label>
+    </div>
+
+    <div>
+        <label>
+            Email:
+            <input type="email" name="email" required>
+        </label>
+    </div>
+
+    <div>
+        <label>
+            Username: 
+            <input type="text" name="username" required>
+        </label>
+    </div>
+
+    <div>
+        <label>
+            Password:
+            <input type="password" name="password" required>
+        </label>
+    </div>
+
+    <div>
+        <label>
+            School: 
+            <input type="text" name="username" required>
+        </label>
+    </div>
+
+    <div>
+        <label><input type="checkbox" name="teacher" value="1" required> I am a teacher.</label>
+    </div>
+
+    <div>
+        <input type="submit" value="Register">
+    </div>
+  </fieldset>
+</form>
+
+{% endblock %}

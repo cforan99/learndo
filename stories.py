@@ -168,22 +168,24 @@ def add_student(username, class_id):
     db.session.commit()
 
     return "{} has been added to {}".format(user.preferred, new_class.class_name)
-    
 
-def create_teacher(first, last, preferred, username, password, email, class_id, teacher):
+
+def create_teacher(first, last, preferred, username, password, email, school, teacher):
     """Teacher registers for a teacher account"""
+
+    #Check if username is unique
 
     if preferred == "":
         preferred == first + " " + last
 
-    new_student = User(is_teacher=1,
+    new_teacher = User(is_teacher=teacher,
                        username=username,
                        password=password,
                        email=email,
                        first_name=first,
                        last_name=last,
                        display_name=preferred,
-                       school=teacher.school)
+                       school=school)
 
 
 
