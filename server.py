@@ -22,7 +22,7 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
-    return "<html><body>Learndo!</body></html>"
+    return "<html><body>Learndo</body></html>"
 
 
 if __name__ == "__main__":
