@@ -116,8 +116,10 @@ class Message(db.Model):
     sent_at = db.Column(db.DateTime)
     read_at = db.Column(db.DateTime)
 
-    sender = db.relationship('User', backref='messages_sent')
-    recipient = db.relationship('User', backref='messages_received')
+    sender = db.relationship('User', primaryjoin='Message.sent_from==User.user_id', 
+                                     backref='messages_sent')
+    recipient = db.relationship('User', primaryjoin='Message.sent_to==User.user_id',
+                                        backref='messages_received')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
