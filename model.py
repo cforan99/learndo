@@ -118,7 +118,7 @@ class Message(db.Model):
 
     sender = db.relationship('User', primaryjoin='Message.sent_from==User.user_id', 
                                      backref='messages_sent')
-    recipient = db.relationship('User', primary_join='Message.sent_to==User.user_id',
+    recipient = db.relationship('User', primaryjoin='Message.sent_to==User.user_id',
                                         backref='messages_received')
 
     def __repr__(self):
