@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>Your Classes</h2>
+    <h3>Add a new class</h3>
+    <form action="/new_class" method="POST">
+        <div>
+            <label>Class name:
+                <input type="text" name="class_name" required>
+            </label>
+            <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+            <input type="submit" value="Create">
+        </div>
+    </form>
+    
+    <h3>Your classes</h3>
+    <ul>
+    {% for class_id in class_list.keys() %}
+        <li><b>{{ class_list[class_id]['class_name'] }}</b></li>
+            {% if 'students' in class_list[class_id] %}
+              <ul>
+                {% for student in class_list[class_id]['students'] %}
+                <li>
+                {{ student.first_name }} {{ student.last_name }} 
+                (<a href="/student/{{student.user_id}}/account">{{student.username}}</a>)</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+    {% endfor %}
+    </ul>
+
+    <h3>Add student by username</h3>
+    <form action="/add_student" method="POST">
+        <div>
+            <label>Username:
+                <input type="text" name="username" required>
+            </label><br>
+            <select name="class-id">
+              {% for class_id in class_list.keys() %}
+              <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
+              {% endfor %}
+            </select>
+            <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+            <input type="submit" value="Add to class">
+        </div>
+    </form>
+
+
+{% endblock %}

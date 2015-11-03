@@ -1,3 +1,4 @@
+from model import User, Class
 
 teacher = User.query.get(teacher_id)  ## Can I make this a global variable or store in session?
 
@@ -108,7 +109,7 @@ def access_profile(user_id):
         return true
     else:
         for teacher_id in teachers:
-            if session['user_id'] == teacher_id
+            if session['user_id'] == teacher_id:
                 return true
             else:
                 return false
@@ -187,7 +188,10 @@ def create_teacher(first, last, preferred, username, password, email, school, te
                        display_name=preferred,
                        school=school)
 
+    db.session.add(new_teacher)
+    db.session.commit()
 
+    return "Your teacher account has been created with the username {} and password {}".format(username, password)
 
 
 

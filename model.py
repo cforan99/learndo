@@ -48,6 +48,7 @@ class Class(db.Model):
         return "<Class class_id=%r class_name=%s>" % (self.class_id, self.class_name)
 
 
+
 class UserClass(db.Model):
     """Association table to connect many users to many classes"""
 
