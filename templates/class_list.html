@@ -16,13 +16,24 @@
     <h3>Your classes</h3>
     <ul>
     {% for class_id in class_list.keys() %}
-        <li><b>{{ class_list[class_id]['class_name'] }}</b></li>
+        <form action="/delete_class" method="POST" class="delete_class">
+        <input type="hidden" name="delete_class_id" value="{{ class_id }}">
+        <li><b>{{ class_list[class_id]['class_name'] }}</b> 
+        <input type="submit" value="x">
+        </li></form>
+
             {% if 'students' in class_list[class_id] %}
               <ul>
                 {% for student in class_list[class_id]['students'] %}
                 <li>
+                <form action="/remove_student" method="POST" class="remove_student">
                 {{ student.first_name }} {{ student.last_name }} 
-                (<a href="/student/{{student.user_id}}/account">{{student.username}}</a>)</li>
+                (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
+                <input type="hidden" name="remove_student_id" value="{{ student.user_id }}">
+                <input type="hidden" name="remove_class_id" value="{{ class_id }}">
+                <input type="submit" value="x">
+                </form>
+                </li>
                 {% endfor %}
               </ul>
             {% endif %}
@@ -45,5 +56,98 @@
         </div>
     </form>
 
+    <h3>Create new student account</h3>
 
+    <form action="/new_student" method="POST">
+    <div>
+        <label>
+            First name: 
+            <input type="text" name="first" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Last name: 
+            <input type="text" name="last" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Preferred name: 
+            <input type="text" name="preferred">
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Email:
+            <input type="email" name="email">
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Username: 
+            <input type="text" name="username" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Password:
+            <input type="password" name="password" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        Class:
+        <select name="class-id">
+          {% for class_id in class_list.keys() %}
+          <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
+          {% endfor %}
+        </select><br><br>
+    </div>
+
+    <div>
+        <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+        <input type="submit" value="Create Account">
+    </div>
+</form>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+    function confirmDelete(result) {
+        console.log("Class deleted successfully.");
+    }
+
+    function deleteClass(evt) {
+      evt.preventDefault();
+
+      var formValues = $(".delete_class").serialize();
+
+      if (confirm('Are you sure you want to delete this class? The students in this class will also be removed from the class.')) {
+        $.post("/delete_class", formValues, confirmDelete);
+      }
+    }
+
+    $(".delete_class").on("submit", deleteClass);
+
+
+    function confirmRemove(result) {
+        console.log("Student removed successfully.");
+    }
+
+    function removeStudent(evt) {
+      evt.preventDefault();
+
+      var formInputs = $(this).closest('form').serialize();
+
+      if (confirm("Are you sure you want to remove this student from the class? This will not delete the student's account.")) {
+        $.post("/remove_student", formInputs, confirmRemove);
+      }
+    }
+
+    $(".remove_student").on("submit", removeStudent);
+</script>
 {% endblock %}

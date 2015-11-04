@@ -2,10 +2,11 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, request, flash, redirect, session
+from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Class
+from helper import *
 
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ def index():
 
     return render_template("homepage.html")
 
-#### REGISTRATION ####
+############### REGISTRATION ###############
 
 @app.route('/register', methods=['GET'])
 def register_form():
@@ -46,7 +47,10 @@ def register_process():
     school = request.form.get("school")
     teacher = request.form.get("teacher")
 
-    print teacher
+    # Check to see if username is available
+    if len(User.query.filter(User.username == username).all()) > 0:
+        flash("That username is already in use. Please choose another.")
+        return redirect('/register')
 
     if preferred == "":
         preferred = first + " " + last
@@ -67,9 +71,10 @@ def register_process():
 
     flash("Your teacher account has been created with the username {} and password {}".format(username, password))
     
-    return redirect("/")
+    return redirect("/teacher/{}".format(new_teacher.user_id))
 
-#### LOGIN / LOGOUT ####
+
+############### LOGIN / LOGOUT ###############
 
 @app.route('/login', methods=['GET'])
 def login_form():
@@ -98,7 +103,7 @@ def login_process():
 
     session["user_id"] = user.user_id
 
-    flash("Logged in")
+    flash("You are now logged in!")
 
     if user.is_teacher:
         return redirect("/teacher/%s" % user.user_id)
@@ -111,11 +116,11 @@ def logout():
     """Log out."""
 
     del session["user_id"]
-    flash("Logged Out.")
+    flash("You are logged out.")
     return redirect("/")
 
 
-#### TEACHER VIEWS ####
+############### TEACHER VIEWS ###############
 
 @app.route('/teacher/<int:user_id>')
 def show_teacher_dashboard(user_id):
@@ -134,34 +139,12 @@ def manage_classes(user_id):
     """Shows class lists and student lists. Teacher can also add classes and students."""
 
     if session['user_id'] == user_id:
-        teacher = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-
+        teacher = User.query.get(user_id) ## Can I make this a global variable or store in session?
         class_list = show_classes(teacher)
-
         return render_template("class_list.html", teacher=teacher, class_list=class_list)
     else:
         flash("You do not have access to that page.")
         return redirect("/")
-
-
-def show_classes(teacher):
-    """Creates a dictionary of class name and list of student objects for each class_id
-    associated with a teacher. Used for printing a list of all the classes for a teacher.
-
-    Example: 
-    {class_id: {'class_name': class_name, 'students': [<student object>, <student object>]}}
-    """
-    class_list = {}
-
-    for each_class in teacher.classes:
-        class_list[each_class.class_id] = {'class_name' : each_class.class_name }
-        for student in each_class.users:
-            if student.is_teacher == 0:
-                if 'students' not in class_list[each_class.class_id]:
-                    class_list[each_class.class_id]['students'] = []
-                class_list[each_class.class_id]['students'].append(student)
-
-    return class_list
 
 
 @app.route('/new_class', methods=['POST'])
@@ -174,13 +157,11 @@ def create_class():
 
     teacher = User.query.get(user_id)
 
-    new_class = Class(class_name=class_name)                
-    new_class.users.append(teacher)
-    db.session.add(new_class)
-    db.session.commit()
+    add_class(teacher, class_name)
 
     flash("{} has been added.".format(class_name))
     return redirect('/teacher/{}/classes'.format(user_id))
+
 
 @app.route('/add_student', methods=['POST'])
 def add_student():
@@ -208,7 +189,207 @@ def add_student():
 
     flash("{} has been added to {}".format(user.first_name, new_class.class_name))
     return redirect('/teacher/{}/classes'.format(teacher_id))
- 
+
+
+@app.route('/delete_class', methods=["POST"])
+def delete_class():
+    """Deletes class from db when teacher clicks link in manage classes dashboard."""
+
+    class_id = request.form.get('class_id')
+    this_class = Class.query.get(class_id)
+
+    print class_id, "*****************"
+
+    users = this_class.users
+
+    authorized = False
+    for user in users:
+        if user.is_teacher and user.user_id == session['user_id']:
+            authorized = True
+
+    if authorized:
+        db.session.delete(this_class)
+        db.session.commit()
+        flash("The class, {}, has been deleted.".format(this_class.class_name))
+        return redirect('/teacher/{}/classes'.format(session['user_id']))
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+
+
+@app.route('/remove_student', methods=["POST"])
+def remove_student():
+    """Deletes class from db when teacher clicks link in manage classes dashboard."""
+
+    student_id = request.form.get('user_id')
+    class_id = request.form.get('class_id')
+
+    print student_id, class_id, "*****************"
+
+    user_class = UserClass.query.filter(UserClass.user_id==student_id, 
+                                        UserClass.class_id==class_id).one()
+
+    this_student = User.query.get(student_id)
+
+    user = User.query.get(session['user_id'])
+
+    authorized = False
+    if user.is_teacher:
+        authorized = True
+
+    if authorized:
+        db.session.delete(user_class)
+        db.session.commit()
+
+        flash("{} has been removed from that class.".format(this_student.display_name))
+        return redirect('/teacher/{}/classes'.format(session['user_id']))
+
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+    
+
+@app.route('/new_student', methods=['POST'])
+def create_student():
+    """Teacher creates new student accounts and add them to classes simultaneously"""
+
+    # Get form variables
+    first = request.form.get("first")
+    last = request.form.get("last")
+    preferred = request.form.get("preferred")
+    email = request.form.get("email")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    class_id = request.form.get("class-id")
+    teacher_id = request.form.get("teacher")
+
+    # Check to see if username is available
+    if len(User.query.filter(User.username == username).all()) > 0:
+        flash("That username is already in use. Please choose another.")
+        return redirect('/teacher/{}/classes'.format(teacher_id))
+
+    if email == "":
+        email = None
+
+    if preferred == "":
+        preferred = first
+
+    teacher = User.query.get(teacher_id)
+
+    new_student = User(is_teacher=0,
+                       username=username,
+                       password=password,
+                       email=email,
+                       first_name=first,
+                       last_name=last,
+                       display_name=preferred,
+                       school=teacher.school)
+
+    print class_id
+
+    new_student.classes.append(Class.query.get(class_id))
+    db.session.add(new_student)
+    db.session.commit()
+    
+    flash("A new account has been created for {} with the username {} and password {}.".format(preferred, username, password))
+    return redirect('/teacher/{}/classes'.format(teacher_id))
+
+
+############### PROFILES ###############
+@app.route('/profile/<int:user_id>')
+def load_profile(user_id):
+    """Renders template for profile page for both students and teachers"""
+
+    user = User.query.get(user_id)
+
+    if user.is_teacher:
+        acct_type = 'Teacher'
+    else:
+        acct_type = 'Student'
+
+    my_classes = []
+    for each_class in user.classes:
+        my_classes.append(each_class.class_name)
+
+    if access_profile(user_id) == True:
+        return render_template("profile.html", user=user, my_classes=my_classes, acct_type=acct_type)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+
+@app.route('/edit_profile', methods=['POST'])
+def edit_profile():
+    """Users can change their profile information"""
+
+    # Get form variables
+    first = request.form.get("first")
+    last = request.form.get("last")
+    preferred = request.form.get("preferred")
+    email = request.form.get("email")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    school = request.form.get("school")
+    user_id = request.form.get("user_id")
+
+    if email == "" or "None":
+            email = None
+
+    if preferred == "" or "None":
+            preferred = first
+
+    user = User.query.get(user_id)
+
+    # Check to see if username is available
+    if len(User.query.filter(User.username == username).all()) > 0 and username != user.username:
+        flash("That username is already in use. Please choose another.")
+        return redirect('/profile/{}'.format(user_id))
+    else:
+        user.first_name = first
+        user.last_name = last
+        user.display_name = preferred
+        user.email = email
+        user.username = username
+        user.password = password
+        user.school = school
+
+        db.session.commit()
+    
+        flash("Your changes have been successfully saved!")
+        return redirect('/profile/{}'.format(user_id))
+
+
+# #THIS WORKS BUT I WILL NOT USE IT UNTIL START ANGULAR
+# @app.route('/profile/<int:user_id>.json')
+# def view_profile(user_id):
+#     """Returns JSON object of user info from db to display on profile page"""
+
+#     user = User.query.get(user_id)
+
+#     if user.is_teacher:
+#         acct_type = 'teacher'
+#     else:
+#         acct_type = 'student'
+
+#     my_classes = []
+#     for each_class in user.classes:
+#         my_classes.append(each_class.class_name)
+
+#     profile_info = {
+#         'first' : user.first_name,
+#         'last' : user.last_name,
+#         'preferred' : user.display_name,
+#         'email' : user.email,
+#         'username' : user.username,
+#         'password' : user.password,
+#         'school' : user.school,
+#         'classes' : my_classes
+#     }
+
+#     if access_profile(user_id) == True:
+#         return jsonify(profile_info)
+
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
