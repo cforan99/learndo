@@ -210,8 +210,10 @@ def delete_class():
     if authorized:
         db.session.delete(this_class)
         db.session.commit()
+        # Why are the next two lines not being run?
         flash("The class, {}, has been deleted.".format(this_class.class_name))
         return redirect('/teacher/{}/classes'.format(session['user_id']))
+    # This does run after the confirm popup.
     else:
         flash("You are not authorized to make this change.")
         return redirect("/")
@@ -357,6 +359,20 @@ def edit_profile():
     
         flash("Your changes have been successfully saved!")
         return redirect('/profile/{}'.format(user_id))
+
+
+############### STUDENT VIEWS ###############
+@app.route('/student/<int:user_id>')
+def show_student_dashboard(user_id):
+    """Initially shows links to messages and tasks"""
+
+    if session['user_id'] == user_id:
+        student = User.query.get(user_id)  ## Can I make this a global variable or store in session?
+        return render_template("sdashboard.html", student=student)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
 
 
 # #THIS WORKS BUT I WILL NOT USE IT UNTIL START ANGULAR

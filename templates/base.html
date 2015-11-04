@@ -15,9 +15,11 @@
 
 <hr>
 
+<div id="flash">
 {% for flash in get_flashed_messages() %}
   {{ flash }}
 {% endfor %}
+</div>
 
 {% block content %}
     Put your body here.
