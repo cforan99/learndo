@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>New Assignment</h2>
+
+<h3>My classes</h3>
+    <ul>
+    {% for class in my_classes %}
+        <li>{{ class }}</li>
+    {% endfor %}
+    </ul>
+
+<h3>Edit account information</h3>
+<form action="/edit_assignment" method="POST">
+    <div>
+        <label>
+            Title: 
+            <input type="text" name="title" value="{{ user.first_name }}" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Last name: 
+            <input type="text" name="last" value="{{ user.last_name }}" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Preferred name: 
+            <input type="text" name="preferred" value="{{ user.display_name }}" >
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Email:
+            <input type="text" name="email" value="{{ user.email }}">
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Username: 
+            <input type="text" name="username" value="{{ user.username}}" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Password:
+            <input type="password" name="password" value="{{ user.password }}" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            School: 
+            <input type="text" name="school" value="{{ user.school }}" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <input type="hidden" name="teacher_id" value="{{ user.user_id }}">
+        <input type="submit" value="Save Changes">
+    </div>
+</form>
+
+
+{% endblock %}

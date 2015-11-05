@@ -374,6 +374,21 @@ def show_student_dashboard(user_id):
         return redirect("/")
 
 
+############### ASSIGNMENT ###############
+
+@app.route('/new_assignment')
+def create_assignment():
+    """Form for creating new assignments"""
+
+
+    user = User.query.get(session['user_id'])
+
+    if user.is_teacher:
+        return render_template("new_assignment.html", user=user)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
 
 # #THIS WORKS BUT I WILL NOT USE IT UNTIL START ANGULAR
 # @app.route('/profile/<int:user_id>.json')

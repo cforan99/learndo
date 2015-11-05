@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>New Assignment</h2>
+
+<form action="/edit_assignment" method="POST">
+    <div>
+        <label>
+            Title: 
+            <input type="text" name="title" size="42" placeholder="short discription" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Learning goal: <br>
+            <textarea name="goal" rows="3" cols="45" placeholder="What will students learn from this assignment?" maxlength="712" required></textarea>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Directions: <br>
+            <textarea name="directions" rows="5" cols="45" maxlength="712" required></textarea>
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Link to on-line resource:<br>
+            <input type="url" name="link" maxlength="256" size="48" placeholder="http://www.edudeveloper.net">
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Due date: 
+              <select id="month" 
+                      name="month"> 
+                <option value="01">Jan.</option>       
+                <option value="02">Feb.</option>       
+                <option value="03">March</option>       
+                <option value="04">April</option>       
+                <option value="05">May</option>       
+                <option value="06">June</option>       
+                <option value="07">July</option>       
+                <option value="08">Aug.</option>       
+                <option value="09">Sept.</option>       
+                <option value="10">Oct.</option>       
+                <option value="11">Nov.</option>       
+                <option value="12">Dec.</option>       
+              </select> 
+              <select id="day" 
+                      name="day"> 
+                <option>1</option>       
+                <option>2</option>       
+                <option>3</option>       
+                <option>4</option>       
+                <option>5</option>       
+                <option>6</option>       
+                <option>7</option>       
+                <option>8</option>       
+                <option>9</option>       
+                <option>10</option>       
+                <option>11</option>       
+                <option>12</option>       
+                <option>13</option>       
+                <option>14</option>       
+                <option>15</option>       
+                <option>16</option>       
+                <option>17</option>       
+                <option>18</option>       
+                <option>19</option>       
+                <option>20</option>       
+                <option>21</option>       
+                <option>22</option>       
+                <option>23</option>       
+                <option>24</option>       
+                <option>25</option>       
+                <option>26</option>       
+                <option>27</option>       
+                <option>28</option>       
+                <option>29</option>       
+                <option>30</option>       
+                <option>31</option>       
+              </select> 
+              <select id="year" 
+                     name="year">       
+                <option>2015</option>       
+                <option>2016</option>       
+                <option>2017</option>             
+              </select> 
+            </label><br>
+            <label>
+              Time due: 
+
+              <select id="hour" 
+                      name="minute"> 
+                <option>1</option>       
+                <option>2</option>       
+                <option>3</option>       
+                <option>4</option>       
+                <option>5</option>       
+                <option>6</option>       
+                <option>7</option>       
+                <option>8</option>       
+                <option>9</option>       
+                <option>10</option>       
+                <option>11</option>       
+                <option>12</option>        
+              </select> 
+              <select id="minute" 
+                      name="minute"> 
+                <option>00</option>       
+                <option>05</option>       
+                <option>10</option>       
+                <option>15</option>       
+                <option>20</option>       
+                <option>25</option>       
+                <option>30</option>       
+                <option>35</option>       
+                <option>40</option>       
+                <option>45</option>       
+                <option>50</option>       
+                <option>55</option>       
+              </select> 
+              <select id="ampm" 
+                     name="ampn"> 
+                <option>am</option>       
+                <option>pm</option>           
+              </select> 
+        </label><br><br>
+    </div>
+
+    <div>
+        <label>
+            Total points:
+            <input type="number" name="points" required>
+        </label><br><br>
+    </div>
+
+    <div>
+        <input type="hidden" name="teacher_id" value="{{ user.user_id }}">
+        <input type="submit" value="Save Assignment">
+    </div>
+</form>
+
+
+
+{% endblock %}
