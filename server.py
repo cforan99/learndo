@@ -4,6 +4,7 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
+from datetime import datetime
 
 from model import connect_to_db, db, User, Class
 from helper import *
@@ -377,9 +378,8 @@ def show_student_dashboard(user_id):
 ############### ASSIGNMENT ###############
 
 @app.route('/new_assignment')
-def create_assignment():
+def show_assignment_form():
     """Form for creating new assignments"""
-
 
     user = User.query.get(session['user_id'])
 
@@ -388,6 +388,77 @@ def create_assignment():
     else:
         flash("You do not have access to that page.")
         return redirect("/")
+
+
+@app.route('/create_assignment', methods=["POST"])
+def create_assignment():
+    """Adds info from assignment form into the tasks table in the db."""
+
+    title = request.form.get("title")
+    goal = request.form.get("goal")
+    directions = request.form.get("directions")
+    link = request.form.get("link")
+    month = request.form.get("month")
+    day = request.form.get("day")
+    year = request.form.get("year")
+    hour = request.form.get("hour")
+    minute = request.form.get("minute")
+    ampm = request.form.get("ampm")
+    points = int(request.form.get("points"))
+    teacher_id = request.form.get("teacher_id")
+
+    if points == "":
+        points = None
+
+    date_string = "{}/{}/{} {}:{} {}".format(month, day, year, hour, minute, ampm)
+    due_date = datetime.strptime(date_string, "%m/%d/%y %I:%M %p")
+
+    user = User.query.get(session['user_id'])
+
+    if user.is_teacher:
+
+        new_task = Task(created_by=teacher_id,
+                        title=title,
+                        goal=goal,
+                        directions=directions,
+                        link=link,
+                        points=points,
+                        due_date=due_date)
+
+        db.session.add(new_task)
+        db.session.commit()
+
+        task_id = new_task.task_id
+
+        return redirect("/teacher/{}/assignments/{}".format(teacher_id, task_id))
+
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+
+
+@app.route('/teacher/<int:teacher_id>/assignments/<int:task_id>')
+def view_assignment(teacher_id, task_id):
+    """Shows assignment information, assign button or class assigned to, and list of students
+    working on that assignment and their progress"""
+
+    task = Task.query.get(task_id)
+    date_obj = task.due_date
+    due_date = date_obj.strftime("%m/%d/%y %I:%M %p")
+
+    created_by = task.user
+
+    class_list = show_classes(created_by)
+
+    user_id = session['user_id']
+
+    if user_id == task.created_by:
+        return render_template("view_assignment.html", task=task, due_date=due_date, class_list=class_list)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+
 
 
 # #THIS WORKS BUT I WILL NOT USE IT UNTIL START ANGULAR

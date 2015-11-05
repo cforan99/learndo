@@ -1,6 +1,7 @@
 """Models and database functions for project"""
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -78,7 +79,7 @@ class Task(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Task task_id=%d title=%s created_by=%s>" % (self.task_id, self.title, self.created_by)
+        return "<Task task_id=%r title=%s created_by=%s>" % (self.task_id, self.title, self.created_by)
 
 
 class Assignment(db.Model):
