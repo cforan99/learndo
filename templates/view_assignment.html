@@ -11,6 +11,7 @@
 			      <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
 			      {% endfor %}
 			    </select>
+			    <input type="hidden" name="task_id" value="{{ task.task_id }}">
 			    <input type="submit" value="Assign">
 			</form>
 	    </div>

@@ -69,6 +69,7 @@ def register_process():
     db.session.commit()
 
     session["user_id"] = new_teacher.user_id
+    session["acct_type"] = 'teacher'
 
     flash("Your teacher account has been created with the username {} and password {}".format(username, password))
     
@@ -104,6 +105,11 @@ def login_process():
 
     session["user_id"] = user.user_id
 
+    if user.is_teacher:
+        session["acct_type"] = 'teacher'
+    else:
+        session["acct_type"] = 'student'
+
     flash("You are now logged in!")
 
     if user.is_teacher:
@@ -117,6 +123,7 @@ def logout():
     """Log out."""
 
     del session["user_id"]
+    del session["acct_type"]
     flash("You are logged out.")
     return redirect("/")
 
@@ -135,6 +142,21 @@ def show_teacher_dashboard(user_id):
         return redirect("/")
 
 
+@app.route('/teacher/<int:user_id>/assignments')
+def show_teacher_assignments(user_id):
+    """Lists assignments created by a teacher"""
+
+    if session['user_id'] == user_id:
+        teacher = User.query.get(user_id)  ## Can I make this a global variable or store in session?
+        tasks = teacher.tasks
+
+        return render_template("tassignments.html", teacher=teacher, tasks=tasks)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+
+############### CLASSES ###############
 @app.route('/teacher/<int:user_id>/classes', methods=['GET'])
 def manage_classes(user_id):
     """Shows class lists and student lists. Teacher can also add classes and students."""
@@ -375,7 +397,23 @@ def show_student_dashboard(user_id):
         return redirect("/")
 
 
-############### ASSIGNMENT ###############
+@app.route('/student/<int:user_id>/assignments')
+def show_student_assignments(user_id):
+    """Lists assignments assigned to a student"""
+
+    if session['user_id'] == user_id:
+        student = User.query.get(user_id)  ## Can I make this a global variable or store in session?
+        assignments = db.session.query(Assignment).filter(Assignment.student_id == 
+            user_id).order_by(Assignment.assigned.desc()).all()
+
+        return render_template("sassignments.html", student=student, assignments=assignments)
+
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+
+############### ASSIGNMENTS ###############
 
 @app.route('/new_assignment')
 def show_assignment_form():
@@ -458,6 +496,33 @@ def view_assignment(teacher_id, task_id):
         flash("You do not have access to that page.")
         return redirect("/")
 
+
+@app.route('/assign', methods=["POST"])
+def assign_to_class():
+    """Assigns task to all users, students and teachers, associated with the selected class."""
+
+    class_id = request.form.get("class-id")
+    task_id = request.form.get("task_id")
+
+    task = Task.query.get(task_id)
+    this_class = Class.query.get(class_id)
+    class_list = this_class.users
+
+    if session['user_id'] == task.created_by:
+        for user in class_list:
+            new_assignment = Assignment(student_id=user.user_id,
+                                        task_id=task_id,
+                                        assigned=datetime.now())
+            db.session.add(new_assignment)
+
+        db.session.commit()
+
+        flash("This has been successfully assigned to {}".format(this_class.class_name))
+        return redirect("/teacher/{}/assignments/{}".format(task.created_by, task_id))
+    
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
 
 
 

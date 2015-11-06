@@ -25,6 +25,28 @@
     Put your body here.
 {% endblock %}
 
+{% block menu %}
+	{% if ("user_id" in session) and ("acct_type" in session) %}
+		{% if session["acct_type"] == 'teacher' %}
+			<ul>
+				<li><a href='/profile/{{ session['user_id'] }}'>View your account information</a></li>
+				<li><a href='/new_assignment'>Create a new assignment</a></li>
+				<li><a href='/teacher/{{ session['user_id'] }}/assignments'>View all your assignments</a></li>
+				<li><a href='/teacher/{{ session['user_id'] }}/messages'>View your messages</a></li>
+				<li><a href='/teacher/{{ session['user_id'] }}/classes'>Manage your classes</a></li>
+			</ul>
+		{% else %}
+			<ul>
+				<li><a href='/profile/{{ session['user_id'] }}'>View your account information</a></li>
+				<li><a href='/student/{{ session['user_id'] }}/assignments'>View all your assignments</a></li>
+				<li><a href='/student/{{ session['user_id'] }}/messages'>View your messages</a></li>
+			</ul>
+		{% endif %}
+	{% else %}
+		<div class="menu"></div>
+	{% endif %}
+
+{% endblock %}
 
 </body>
 </html>
