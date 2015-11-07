@@ -488,6 +488,9 @@ def view_assignment(teacher_id, task_id):
 
     class_list = show_classes(created_by)
 
+    # assignment = task.assignments.filter(student_id == teacher_id)
+    # Left off here 11/5 trying to id assigned status and class assigned to
+
     user_id = session['user_id']
 
     if user_id == task.created_by:
@@ -495,6 +498,70 @@ def view_assignment(teacher_id, task_id):
     else:
         flash("You do not have access to that page.")
         return redirect("/")
+
+
+@app.route('/teacher/<int:teacher_id>/assignments/<int:task_id>/edit', methods=["GET"])
+def edit_assignment_form(teacher_id, task_id):
+    """Shows assignment information in an editable form"""
+
+    print task_id
+
+    teacher = User.query.get(teacher_id)
+    task = Task.query.get(task_id)
+
+    print task
+
+    #Unpack due_date into month, day, year, hour, minute, ampm
+
+    if session['user_id'] == teacher_id:
+        return render_template("edit_assignment.html", teacher=teacher, task=task)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+
+@app.route('/edit_assignment', methods=["POST"])
+def edit_assignment():
+    """Update the db with assignment edits from teacher"""
+
+    # Get form variables
+    title = request.form.get("title")
+    goal = request.form.get("goal")
+    directions = request.form.get("directions")
+    link = request.form.get("link")
+    month = request.form.get("month")
+    day = request.form.get("day")
+    year = request.form.get("year")
+    hour = request.form.get("hour")
+    minute = request.form.get("minute")
+    ampm = request.form.get("ampm")
+    points = int(request.form.get("points"))
+    teacher_id = request.form.get("teacher_id")
+    task_id = request.form.get("task_id")
+
+    if points == "":
+        points = None
+
+    date_string = "{}/{}/{} {}:{} {}".format(month, day, year, hour, minute, ampm)
+    due_date = datetime.strptime(date_string, "%m/%d/%y %I:%M %p")
+
+    user = User.query.get(user_id)
+
+    # Check to see if username is available
+    if teacher_id == task.created_by:
+
+        task.title = title
+        task.goal = goal
+        task.directions = directions
+        task.link = link
+        task.points = points
+        task.due_date = due_date
+
+        db.session.commit()
+    
+        flash("Your changes have been successfully saved!")
+        return redirect('/profile/{}'.format(user_id))
+
 
 
 @app.route('/assign', methods=["POST"])
