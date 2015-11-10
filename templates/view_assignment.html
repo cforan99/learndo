@@ -2,7 +2,48 @@
 {% block content %}
 
 <h2>{{ task.title }}</h2>
+
 <div class="assign">
+  {% if class_name != None %}
+  	<h3>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h3>
+  	<table id="student-progress">
+  		<thead>
+  			<tr><td>Student Name</td>
+  			<td>Status</td>
+  			<td>Timestamp</td>
+  			</tr>
+  		</thead>
+  		<tbody>
+
+  		{% for s in progress %}
+  			<tr><td class="name">{{ progress[s]['first'] }} {{ progress[s]['last'] }}</td>
+  			{% if progress[s]['completed'] %}
+  				<td class="completed">Done</td>
+  				<td class="timestamp">Completed: {{ progress[s]['completed'] }}</td>
+  				</tr>
+  			{% elif progress[s]['overdue'] %}
+  				<td class="overdue">Overdue</td>
+  				{% if progress[s]['viewed'] %}
+  					<td class="timestamp">Last Viewed: {{ progress[s]['viewed'] }}</td>
+  				{% else %}
+  					<td class="timestamp">Not yet viewed</td>
+  					</tr>
+  				{% endif %}
+  			{% elif progress[s]['viewed'] %}
+  				<td class="viewed">In progress</td>
+  				<td class="timestamp">Last Viewed: {{ progress[s]['viewed'] }}</td>
+  				</tr>
+  			{% else %}
+  				<td class="inactive">Not viewed</td>
+  				<td class="timestamp">Assigned on: {{ progress[s]['assigned'] }}</td>
+  				</tr>
+  			{% endif%}
+  		{% endfor %}
+
+  		</tbody>
+  	</table>	
+
+  {% else %}
 	<p>This has not yet been assign. Select a class to assign.</p>
 	    <div class="assign_status">
 	        <form action="/assign" method="POST">
@@ -15,9 +56,12 @@
 			    <input type="submit" value="Assign">
 			</form>
 	    </div>
+  {% endif %}
 </div>
 
 <div class="assignment">
+  <h2>Assignment Details 
+    <button onclick="location.href='/teacher/{{ task.created_by }}/assignments/{{ task.task_id }}/edit'">edit</button></h2> 
 	<h3>Learning goal:</h3>
 	<p>{{ task.goal }}</p>
 

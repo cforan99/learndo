@@ -19,7 +19,6 @@ app.secret_key = "This_should_be_secret"
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
-
 @app.route('/')
 def index():
     """Homepage with registration form and login link"""
@@ -482,19 +481,33 @@ def view_assignment(teacher_id, task_id):
 
     task = Task.query.get(task_id)
     date_obj = task.due_date
-    due_date = date_obj.strftime("%m/%d/%y %I:%M %p")
+    due_date = date_obj.strftime("%A %m/%d/%y %I:%M %p")
 
+    # Creates a class list for the dropdown menu in the assignment form
     created_by = task.user
-
     class_list = show_classes(created_by)
 
-    # assignment = task.assignments.filter(student_id == teacher_id)
-    # Left off here 11/5 trying to id assigned status and class assigned to
+    # Checks to see if this task has been assigned by creating a list of assignment objects
+    assignment_list = Assignment.query.filter(Assignment.task_id == task_id).order_by(Assignment.student_id.desc()).all()
 
+    if assignment_list:
+        class_name = find_class_by_task(task_id) # Queries db (a lot) to find the name of the class it is assigned to
+        assigned_on = assignment_list[0].assigned.strftime("%A %m/%d/%y %I:%M %p") # Stores date assigned
+        progress = report_student_progress(task, assignment_list) # Generates a dictionary with student progress
+
+    else:
+        class_name = None
+
+    # double-checks authorization before rendering template
     user_id = session['user_id']
 
     if user_id == task.created_by:
-        return render_template("view_assignment.html", task=task, due_date=due_date, class_list=class_list)
+        return render_template("view_assignment.html", task=task, 
+                                                       due_date=due_date, 
+                                                       class_list=class_list, 
+                                                       class_name=class_name,
+                                                       assigned_on=assigned_on,
+                                                       progress=progress)
     else:
         flash("You do not have access to that page.")
         return redirect("/")
@@ -512,9 +525,22 @@ def edit_assignment_form(teacher_id, task_id):
     print task
 
     #Unpack due_date into month, day, year, hour, minute, ampm
+    month = task.due_date.strftime("%m")
+    day = task.due_date.strftime("%d")
+    year = task.due_date.strftime("%y")
+    hour = task.due_date.strftime("%I")
+    minute = task.due_date.strftime("%M")
+    ampm = task.due_date.strftime("%p")
 
     if session['user_id'] == teacher_id:
-        return render_template("edit_assignment.html", teacher=teacher, task=task)
+        return render_template("edit_assignment.html", teacher=teacher, 
+                                                       task=task,
+                                                       month=month,
+                                                       day=day,
+                                                       year=year,
+                                                       hour=hour,
+                                                       minute=minute,
+                                                       ampm=ampm)
     else:
         flash("You do not have access to that page.")
         return redirect("/")
@@ -536,8 +562,8 @@ def edit_assignment():
     minute = request.form.get("minute")
     ampm = request.form.get("ampm")
     points = int(request.form.get("points"))
-    teacher_id = request.form.get("teacher_id")
-    task_id = request.form.get("task_id")
+    teacher_id = int(request.form.get("teacher_id"))
+    task_id = int(request.form.get("task_id"))
 
     if points == "":
         points = None
@@ -545,9 +571,8 @@ def edit_assignment():
     date_string = "{}/{}/{} {}:{} {}".format(month, day, year, hour, minute, ampm)
     due_date = datetime.strptime(date_string, "%m/%d/%y %I:%M %p")
 
-    user = User.query.get(user_id)
+    task = Task.query.get(task_id)
 
-    # Check to see if username is available
     if teacher_id == task.created_by:
 
         task.title = title
@@ -560,8 +585,11 @@ def edit_assignment():
         db.session.commit()
     
         flash("Your changes have been successfully saved!")
-        return redirect('/profile/{}'.format(user_id))
+        return redirect('/teacher/{}/assignments/{}'.format(teacher_id, task_id))
 
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
 
 
 @app.route('/assign', methods=["POST"])
@@ -634,5 +662,7 @@ if __name__ == "__main__":
 
     # Use the DebugToolbar
     DebugToolbarExtension(app)
+
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
     app.run()

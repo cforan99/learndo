@@ -140,6 +140,20 @@
         <input type="submit" value="Save Changes">
     </div>
 </form>
-
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+    var month = "{{ month }}"
+    var day = "{{ day }}"
+    var year = "{{ year }}"
+    var hour = "{{ hour }}"
+    var minute = "{{ minute }}"
+    var ampm= "{{ ampm }}"
+    $('#month option[value="' + month + '"]').prop('selected', true)
+    $('#day option[value="' + day + '"]').prop('selected', true)
+    $('#year option[value="' + year + '"]').prop('selected', true)
+    $('#hour option[value="' + hour + '"]').prop('selected', true)
+    $('#minute option[value="' + minute + '"]').prop('selected', true)
+    $('#ampm option[value="' + ampm + '"]').prop('selected', true)
+</script>
 
 {% endblock %}
