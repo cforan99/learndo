@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>{{ task.title }}</h2> 
+
+<div class="assignment">
+
+	<div class="checkbox">
+		<form action="/completed" method="POST" class="form">
+			<label for="checkbox">I have finished this assignment!</label> <input type="checkbox" name="completed" class="complete">
+			<input type="hidden" name="assign_id" value="{{ assignment.assign_id }}">
+		</form>
+	</div>
+
+	<h4>Due date: {{ due_date }}</h4>
+	<h4>Assigned on {{ assigned_on }}</h4>
+
+	<h3>Learning goal:</h3>
+	<p>{{ task.goal }}</p>
+
+	<h3>Directions</h3>
+	<p>{{ task.directions }}</p>
+
+	<h3>Link to resource:</h3>
+	<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
+
+
+	<h3>Total points: {{ task.points }}</h3>
+</div>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+    var completed = "{{ assignment.completed }}"
+    if (completed == "None") {
+    	completed = null;
+    }
+    
+    if (completed) {
+    	$('.complete').prop('checked', true)
+    } else {
+    	$('.complete').prop('checked', false)
+    }
+
+    $('.complete').on('change',function(){
+       $('.form').submit();
+       });
+</script>
+	{% endblock %}

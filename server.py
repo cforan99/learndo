@@ -412,6 +412,55 @@ def show_student_assignments(user_id):
         return redirect("/")
 
 
+@app.route('/student/<int:student_id>/assignments/<int:assign_id>')
+def view_student_assignment(student_id, assign_id):
+    """Shows assignment information to student with a form to check that an assignment is complete"""
+
+    assignment = Assignment.query.get(assign_id)
+    task = assignment.task
+    date_obj = task.due_date
+    due_date = date_obj.strftime("%A %m/%d/%y %I:%M %p")
+    assigned_on = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p") # Stores date assigned
+
+    # double-checks authorization before rendering template
+    user_id = session['user_id']
+
+    if user_id == student_id:
+        assignment.viewed = datetime.now()
+        db.session.commit()
+        return render_template("sassignment_view.html", task=task, 
+                                                        due_date=due_date,
+                                                        assignment=assignment, 
+                                                        assigned_on=assigned_on)
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+
+@app.route('/completed', methods=["POST"])
+def complete_assignment():
+
+    completed = request.form.get("completed")
+    assign_id = request.form.get("assign_id")
+
+    print "*****Completed:", completed, "Assign_ID:", assign_id
+
+    assignment = Assignment.query.get(assign_id)
+
+    if completed:
+        assignment.completed = datetime.now()
+        flash("Congratulations on finishing! Your teacher has been notified.")
+    else:
+        assignment.completed = None
+        flash("Your teacher has been notified that you are still working.")
+        
+    db.session.commit()
+
+
+    return redirect("/student/{}/assignments/{}".format(assignment.student_id, assign_id))
+
+
+
 ############### ASSIGNMENTS ###############
 
 @app.route('/new_assignment')
@@ -496,7 +545,9 @@ def view_assignment(teacher_id, task_id):
         progress = report_student_progress(task, assignment_list) # Generates a dictionary with student progress
 
     else:
+        assigned_on = None
         class_name = None
+        progress = None
 
     # double-checks authorization before rendering template
     user_id = session['user_id']

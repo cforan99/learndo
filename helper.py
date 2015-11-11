@@ -114,6 +114,7 @@ def report_student_progress(task, assignment_list):
                 viewed = None
             if assignment.completed:
                 completed = assignment.completed.strftime("%A %m/%d/%y %I:%M %p")
+                overdue = False
             else:
                 completed = None
                 due_date = task.due_date

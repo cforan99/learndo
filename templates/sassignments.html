@@ -5,7 +5,7 @@
 
 <div class="assignment-list">
 	{% for assignment in assignments %}
-	<h3><a href="/teacher/{{ assignment.task.created_by }}/assignments/{{ assignment.task_id }}">
+	<h3><a href="/student/{{ assignment.student_id }}/assignments/{{ assignment.assign_id }}">
 	{{ assignment.task.title }}</a></h3>
 	<p>{{ assignment.task.goal }}</p>
 	<p><b>Due date:</b> {{ assignment.task.due_date.strftime("%m/%d/%y %I:%M %p") }} &nbsp; &nbsp; <b>Points:</b> {{ assignment.task.points }}</p>
