@@ -140,7 +140,9 @@
         <input type="submit" value="Save Changes">
     </div>
 </form>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+{% endblock %}
+
+{% block js%}
 <script>
     var month = "{{ month }}"
     var day = "{{ day }}"
@@ -155,5 +157,4 @@
     $('#minute option[value="' + minute + '"]').prop('selected', true)
     $('#ampm option[value="' + ampm + '"]').prop('selected', true)
 </script>
-
 {% endblock %}

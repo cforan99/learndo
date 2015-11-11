@@ -109,12 +109,12 @@ def login_process():
     else:
         session["acct_type"] = 'student'
 
-    flash("You are now logged in!")
+    flash("Welcome, {}!".format(user.display_name))
 
     if user.is_teacher:
-        return redirect("/teacher/%s" % user.user_id)
+        return redirect("/teacher/%s/assignments" % user.user_id)
     else:
-        return redirect("/student/%s" % user.user_id)
+        return redirect("/student/%s/assignments" % user.user_id)
 
 
 @app.route('/logout')
@@ -453,7 +453,7 @@ def complete_assignment():
     else:
         assignment.completed = None
         flash("Your teacher has been notified that you are still working.")
-        
+
     db.session.commit()
 
 

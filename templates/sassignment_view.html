@@ -27,13 +27,15 @@
 
 	<h3>Total points: {{ task.points }}</h3>
 </div>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+{% endblock %}
+
+{% block js %}
 <script>
     var completed = "{{ assignment.completed }}"
     if (completed == "None") {
     	completed = null;
     }
-    
+
     if (completed) {
     	$('.complete').prop('checked', true)
     } else {
@@ -44,4 +46,4 @@
        $('.form').submit();
        });
 </script>
-	{% endblock %}
+{% endblock %}

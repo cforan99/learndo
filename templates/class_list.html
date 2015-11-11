@@ -112,7 +112,9 @@
         <input type="submit" value="Create Account">
     </div>
 </form>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+{% endblock %} 
+
+{% block js %}
 <script>
     function confirmDelete(result) {
         window.location.reload()
@@ -155,5 +157,4 @@
     $("button.remove_student").on("click", removeStudent);
 
 </script>
-
 {% endblock %}
