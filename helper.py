@@ -2,7 +2,7 @@ from model import *
 from flask import session
 
 def add_class(teacher, class_name):
-    """Teacher creates a new class"""
+    """Create a new class in db and add the teacher to the class"""
 
     new_class = Class(class_name=class_name)                
     new_class.users.append(teacher)

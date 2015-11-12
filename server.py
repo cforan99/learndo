@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 from datetime import datetime
 
-from model import connect_to_db, db, User, Class
+from model import connect_to_db, db, User, Class, Assignment, Task, UserClass
 from helper import *
 
 
@@ -29,13 +29,14 @@ def index():
 
 @app.route('/register', methods=['GET'])
 def register_form():
+    """Shows registration form"""
 
     return render_template("register_form.html")
 
 
 @app.route('/register', methods=['POST'])
 def register_process():
-    """Process registration."""
+    """Processes registration, creates a new user in db, and saves user info in session."""
 
     # Get form variables
     first = request.form.get("first")
@@ -55,6 +56,7 @@ def register_process():
     if preferred == "":
         preferred = first + " " + last
 
+    # Create a new user in the db
     new_teacher = User(is_teacher=teacher,
                        username=username,
                        password=password,
@@ -67,12 +69,13 @@ def register_process():
     db.session.add(new_teacher)
     db.session.commit()
 
+    # Save user info in session
     session["user_id"] = new_teacher.user_id
     session["acct_type"] = 'teacher'
 
     flash("Your teacher account has been created with the username {} and password {}".format(username, password))
     
-    return redirect("/teacher/{}".format(new_teacher.user_id))
+    return redirect("/teacher/{}/classes".format(new_teacher.user_id))
 
 
 ############### LOGIN / LOGOUT ###############
@@ -92,16 +95,16 @@ def login_process():
     username = request.form["username"]
     password = request.form["password"]
 
+    # Check for matching user and correct password
     user = User.query.filter_by(username=username).first()
-
     if not user:
         flash("No such user")
         return redirect("/login")
-
     if user.password != password:
         flash("Incorrect password")
         return redirect("/login")
 
+    # Save user id and account type in session
     session["user_id"] = user.user_id
 
     if user.is_teacher:
@@ -111,6 +114,7 @@ def login_process():
 
     flash("Welcome, {}!".format(user.display_name))
 
+    # Redirect to assignments list after log in
     if user.is_teacher:
         return redirect("/teacher/%s/assignments" % user.user_id)
     else:
@@ -129,6 +133,7 @@ def logout():
 
 ############### TEACHER VIEWS ###############
 
+# No more need for dashboard, so should this just become the user's profile page?
 @app.route('/teacher/<int:user_id>')
 def show_teacher_dashboard(user_id):
     """Initially shows links to messages, tasks, classes, and create a new task"""
@@ -156,7 +161,7 @@ def show_teacher_assignments(user_id):
 
 
 ############### CLASSES ###############
-@app.route('/teacher/<int:user_id>/classes', methods=['GET'])
+@app.route('/teacher/<int:user_id>/classes')
 def manage_classes(user_id):
     """Shows class lists and student lists. Teacher can also add classes and students."""
 
@@ -177,17 +182,22 @@ def create_class():
     user_id = request.form.get("teacher")
     class_name = request.form.get("class_name")
 
-    teacher = User.query.get(user_id)
+    # Create a new class in db and add the teacher to the class.
+    if session['acct_type'] == 'teacher':
+        teacher = User.query.get(user_id)
+        add_class(teacher, class_name)
 
-    add_class(teacher, class_name)
-
-    flash("{} has been added.".format(class_name))
-    return redirect('/teacher/{}/classes'.format(user_id))
+        flash("{} has been added.".format(class_name))
+        return redirect('/teacher/{}/classes'.format(user_id))
+    
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
 
 
 @app.route('/add_student', methods=['POST'])
 def add_student():
-    """Teacher can add existing student to class by username"""
+    """Add a student by username to a class"""
     
     # Get variables from form
     username = request.form.get('username')
@@ -196,6 +206,7 @@ def add_student():
 
     new_class = Class.query.get(class_id)
 
+    # Checks to see if username is already in use.
     try:
         user = User.query.filter(User.username == username).one()
         exists = True
@@ -205,12 +216,16 @@ def add_student():
         return redirect('/teacher/{}/classes'.format(teacher_id))
 
     if exists:
-        user.classes.append(new_class)
+        if session['acct_type'] == 'teacher':
+            user.classes.append(new_class)
+            db.session.commit()
+            flash("{} has been added to {}".format(user.first_name, new_class.class_name))
+            
+            return redirect('/teacher/{}/classes'.format(teacher_id))
 
-    db.session.commit()
-
-    flash("{} has been added to {}".format(user.first_name, new_class.class_name))
-    return redirect('/teacher/{}/classes'.format(teacher_id))
+        else:
+            flash("You are not authorized to make this change.")
+            return redirect("/")
 
 
 @app.route('/delete_class', methods=["POST"])
@@ -220,10 +235,9 @@ def delete_class():
     class_id = request.form.get('class_id')
     this_class = Class.query.get(class_id)
 
-    print class_id, "*****************"
-
     users = this_class.users
 
+    # Check to see if the user is the teacher of the class
     authorized = False
     for user in users:
         if user.is_teacher and user.user_id == session['user_id']:
@@ -243,25 +257,17 @@ def delete_class():
 
 @app.route('/remove_student', methods=["POST"])
 def remove_student():
-    """Deletes class from db when teacher clicks link in manage classes dashboard."""
+    """Deletes student from the class in the db."""
 
     student_id = request.form.get('user_id')
     class_id = request.form.get('class_id')
-
-    print student_id, class_id, "*****************"
 
     user_class = UserClass.query.filter(UserClass.user_id==student_id, 
                                         UserClass.class_id==class_id).one()
 
     this_student = User.query.get(student_id)
 
-    user = User.query.get(session['user_id'])
-
-    authorized = False
-    if user.is_teacher:
-        authorized = True
-
-    if authorized:
+    if session['acct_type'] == 'teacher':
         db.session.delete(user_class)
         db.session.commit()
 
@@ -298,25 +304,29 @@ def create_student():
     if preferred == "":
         preferred = first
 
-    teacher = User.query.get(teacher_id)
+    if session['acct_type'] == 'teacher':
+        teacher = User.query.get(teacher_id)
 
-    new_student = User(is_teacher=0,
-                       username=username,
-                       password=password,
-                       email=email,
-                       first_name=first,
-                       last_name=last,
-                       display_name=preferred,
-                       school=teacher.school)
+        # Creates new user in db
+        new_student = User(is_teacher=0,
+                           username=username,
+                           password=password,
+                           email=email,
+                           first_name=first,
+                           last_name=last,
+                           display_name=preferred,
+                           school=teacher.school)
 
-    print class_id
+        new_student.classes.append(Class.query.get(class_id))
+        db.session.add(new_student)
+        db.session.commit()
+        
+        flash("A new account has been created for {} with the username {} and password {}.".format(preferred, username, password))
+        return redirect('/teacher/{}/classes'.format(teacher_id))
 
-    new_student.classes.append(Class.query.get(class_id))
-    db.session.add(new_student)
-    db.session.commit()
-    
-    flash("A new account has been created for {} with the username {} and password {}.".format(preferred, username, password))
-    return redirect('/teacher/{}/classes'.format(teacher_id))
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
 
 
 ############### PROFILES ###############
@@ -443,8 +453,6 @@ def complete_assignment():
     completed = request.form.get("completed")
     assign_id = request.form.get("assign_id")
 
-    print "*****Completed:", completed, "Assign_ID:", assign_id
-
     assignment = Assignment.query.get(assign_id)
 
     if completed:
@@ -455,7 +463,6 @@ def complete_assignment():
         flash("Your teacher has been notified that you are still working.")
 
     db.session.commit()
-
 
     return redirect("/student/{}/assignments/{}".format(assignment.student_id, assign_id))
 
@@ -568,12 +575,8 @@ def view_assignment(teacher_id, task_id):
 def edit_assignment_form(teacher_id, task_id):
     """Shows assignment information in an editable form"""
 
-    print task_id
-
     teacher = User.query.get(teacher_id)
     task = Task.query.get(task_id)
-
-    print task
 
     #Unpack due_date into month, day, year, hour, minute, ampm
     month = task.due_date.strftime("%m")
