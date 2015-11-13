@@ -30,6 +30,28 @@ def show_classes(teacher):
     return class_list
 
 
+def json_classes(teacher):
+    """Creates a dictionary of class name and list of student objects for each class_id
+    associated with a teacher. Used for printing a list of all the classes for a teacher.
+
+    Example: 
+    {class_id: {'class_name': class_name, 'students': [<student object>, <student object>]}}
+    """
+    class_list = {}
+
+    for each_class in teacher.classes:
+        class_list[each_class.class_id] = {'class_name' : each_class.class_name }
+        for student in each_class.users:
+            if student.is_teacher == 0:
+                if 'students' not in class_list[each_class.class_id]:
+                    class_list[each_class.class_id]['students'] = {}
+                class_list[each_class.class_id]['students'][student.user_id] =  { 'first' : student.display_name,
+                                                                                  'last' : student.last_name,
+                                                                                  'username' : student.username }
+
+    return class_list
+
+
 def list_teachers(student_id):
     """Returns a list of teachers associated with that student"""
 

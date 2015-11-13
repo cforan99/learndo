@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+    <title>Learndo</title>
+    <style>
+    .content {
+        display:none;
+        padding: 10px;
+        background-color: #e5eecc;
+        border: solid 1px #c3c3c3;
+        width: 300px;
+    }
+    #select-form {
+    	width: 300px;
+    	text-align: center;
+    	padding: 10px;
+    }
+    </style>
+</head>
+<body>
+<div id="select-form">
+	<button id="new-class">New Class</button>
+	<button id="add-student">Add Student</button>
+	<button id="new-student">New Student</button>
+</div>
+<div id="classes-forms">
+	<div class="new-class content">
+		<h3>Add a new class</h3>
+		<form action="/new-class" method="POST">
+		    <div>
+		        <label>Class name:
+		            <input type="text" name="class-name" required>
+		        </label>
+		        <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+		        <input type="submit" id="create-class" value="Create">
+		    </div>
+		</form>
+	</div>
+	<div class="add-student content">
+		<h3>Add student by username</h3>
+<!-- 		<form action="/add-student-js" method="POST">
+		    <div>
+		        <label>Username:
+		            <input type="text" name="username" required>
+		        </label><br>
+		        <select name="class-id">
+		          {% for class_id in class_list.keys() %}
+		          <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
+		          {% endfor %}
+		        </select>
+		        <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+		        <input type="submit" value="Add to class">
+		    </div>
+		</form> -->
+	</div>
+	<div class="new-student content">
+		<h3>Create new student account</h3>
+	</div>
+</div>
+<div id="class-list">
+	<h3>Your classes</h3>
+		<ul id="list-class"></ul>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">
+	// clicking on button reveals that form
+	$( "button" ).click(function() {
+	    $(".content").hide();
+	    var form = $(this).attr('id');
+	    $('.'+form+'.content').slideDown();
+	});
+
+    // Iterate over class list
+    function generateClassList(data) {
+    	var classes = data;
+    	for (eachClass in classes) {
+    		$("#list-class").append("<li id='c"+eachClass+"'>"+classes[eachClass]['class_name']+"</li>");
+    		$("li#c"+eachClass).append("<ul class='students'>");
+    		for (student in classes[eachClass]['students']) {
+    			first = classes[eachClass]['students'][student]['first'];
+    			last = classes[eachClass]['students'][student]['last'];
+    			$("li#c"+eachClass+" ul.students").append("<li id='s"+student+"'>"+first+" "+last+"</li>");
+    		}
+    		$("li#c"+eachClass).append("</ul>");
+
+
+    	}
+    }
+
+    // Get class list as JSON
+    $.get("http://localhost:5000/class-list-js", generateClassList);
+
+</script>
+</body>
+</html>

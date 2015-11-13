@@ -19,6 +19,187 @@ app.secret_key = "This_should_be_secret"
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
+############# TEST ROUTES #####################
+
+@app.route('/teacher/<int:user_id>/classes-js')
+def manage_classes_js(user_id):
+    """Shows class lists and student lists. Teacher can also add classes and students."""
+
+    if session['user_id'] == user_id:
+        return render_template("/class-list-js.html")
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+@app.route('/class-list-js')
+def generate_class_list():
+    """Creates a json object with class list info."""
+
+    # if session['user_id'] == user_id:
+
+    teacher = User.query.get(7)
+    class_list = json_classes(teacher)
+    return jsonify(class_list)
+
+
+@app.route('/new-class-js', methods=['POST'])
+def create_class_js():
+    """Adds new class to db"""
+
+    #Get form variables
+    user_id = request.form["teacher"]
+    class_name = request.form.get("class_name")
+
+    # Create a new class in db and add the teacher to the class.
+    if session['acct_type'] == 'teacher':
+        teacher = User.query.get(user_id)
+        add_class(teacher, class_name)
+
+        flash("{} has been added.".format(class_name))
+        return redirect('/teacher/{}/classes'.format(user_id))
+    
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+
+
+@app.route('/add-student-js', methods=['POST'])
+def add_student_js():
+    """Add a student by username to a class"""
+    
+    # Get variables from form
+    username = request.form.get('username')
+    class_id = request.form.get('class-id')
+    teacher_id = request.form.get("teacher")
+
+    new_class = Class.query.get(class_id)
+
+    # Checks to see if username is already in use.
+    try:
+        user = User.query.filter(User.username == username).one()
+        exists = True
+    except:
+        exists = False
+        flash("There is no student with that username.")
+        return redirect('/teacher/{}/classes'.format(teacher_id))
+
+    if exists:
+        if session['acct_type'] == 'teacher':
+            user.classes.append(new_class)
+            db.session.commit()
+            flash("{} has been added to {}".format(user.first_name, new_class.class_name))
+            
+            return redirect('/teacher/{}/classes'.format(teacher_id))
+
+        else:
+            flash("You are not authorized to make this change.")
+            return redirect("/")
+
+
+@app.route('/delete-class-js', methods=["POST"])
+def delete_class_js():
+    """Deletes class from db when teacher clicks link in manage classes dashboard."""
+
+    class_id = request.form.get('class_id')
+    this_class = Class.query.get(class_id)
+
+    users = this_class.users
+
+    # Check to see if the user is the teacher of the class
+    authorized = False
+    for user in users:
+        if user.is_teacher and user.user_id == session['user_id']:
+            authorized = True
+
+    if authorized:
+        db.session.delete(this_class)
+        db.session.commit()
+        # Why are the next two lines not being run?
+        flash("The class, {}, has been deleted.".format(this_class.class_name))
+        return redirect('/teacher/{}/classes'.format(session['user_id']))
+    # This does run after the confirm popup.
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+
+
+@app.route('/remove-student-js', methods=["POST"])
+def remove_student_js():
+    """Deletes student from the class in the db."""
+
+    student_id = request.form.get('user_id')
+    class_id = request.form.get('class_id')
+
+    user_class = UserClass.query.filter(UserClass.user_id==student_id, 
+                                        UserClass.class_id==class_id).one()
+
+    this_student = User.query.get(student_id)
+
+    if session['acct_type'] == 'teacher':
+        db.session.delete(user_class)
+        db.session.commit()
+
+        flash("{} has been removed from that class.".format(this_student.display_name))
+        return redirect('/teacher/{}/classes'.format(session['user_id']))
+
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+    
+
+@app.route('/new-student-js', methods=['POST'])
+def create_student_js():
+    """Teacher creates new student accounts and add them to classes simultaneously"""
+
+    # Get form variables
+    first = request.form.get("first")
+    last = request.form.get("last")
+    preferred = request.form.get("preferred")
+    email = request.form.get("email")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    class_id = request.form.get("class-id")
+    teacher_id = request.form.get("teacher")
+
+    # Check to see if username is available
+    if len(User.query.filter(User.username == username).all()) > 0:
+        flash("That username is already in use. Please choose another.")
+        return redirect('/teacher/{}/classes'.format(teacher_id))
+
+    if email == "":
+        email = None
+
+    if preferred == "":
+        preferred = first
+
+    if session['acct_type'] == 'teacher':
+        teacher = User.query.get(teacher_id)
+
+        # Creates new user in db
+        new_student = User(is_teacher=0,
+                           username=username,
+                           password=password,
+                           email=email,
+                           first_name=first,
+                           last_name=last,
+                           display_name=preferred,
+                           school=teacher.school)
+
+        new_student.classes.append(Class.query.get(class_id))
+        db.session.add(new_student)
+        db.session.commit()
+        
+        flash("A new account has been created for {} with the username {} and password {}.".format(preferred, username, password))
+        return redirect('/teacher/{}/classes'.format(teacher_id))
+
+    else:
+        flash("You are not authorized to make this change.")
+        return redirect("/")
+
+
+
+########### END OF TEST ROUTES ###################
+
 @app.route('/')
 def index():
     """Homepage with registration form and login link"""
@@ -179,7 +360,7 @@ def create_class():
     """Adds new class to db"""
 
     #Get form variables
-    user_id = request.form.get("teacher")
+    user_id = request.form["teacher"]
     class_name = request.form.get("class_name")
 
     # Create a new class in db and add the teacher to the class.
@@ -336,17 +517,12 @@ def load_profile(user_id):
 
     user = User.query.get(user_id)
 
-    if user.is_teacher:
-        acct_type = 'Teacher'
-    else:
-        acct_type = 'Student'
-
     my_classes = []
     for each_class in user.classes:
         my_classes.append(each_class.class_name)
 
     if access_profile(user_id) == True:
-        return render_template("profile.html", user=user, my_classes=my_classes, acct_type=acct_type)
+        return render_template("profile.html", user=user, my_classes=my_classes, acct_type=session['acct_type'])
     else:
         flash("You do not have access to that page.")
         return redirect("/")

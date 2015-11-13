@@ -9,33 +9,35 @@
                 <input type="text" name="class_name" required>
             </label>
             <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-            <input type="submit" value="Create">
+            <input type="submit" id="create-class" value="Create">
         </div>
     </form>
     
-    <h3>Your classes</h3>
-    <ul>
-    {% for class_id in class_list.keys() %}
+    <div id="class-list">
+        <h3 id="your-classes">Your classes</h3>
+        <ul>
+        {% for class_id in class_list.keys() %}
 
-        <li><b>{{ class_list[class_id]['class_name'] }}</b> 
-        <button class="delete_class" data-classid="{{ class_id }}">x</button>
-        </li></form>
+            <li><b>{{ class_list[class_id]['class_name'] }}</b> 
+            <button class="delete_class" data-classid="{{ class_id }}">x</button>
+            </li></form>
 
-            {% if 'students' in class_list[class_id] %}
-              <ul>
-                {% for student in class_list[class_id]['students'] %}
-                <li>
-                {{ student.first_name }} {{ student.last_name }} 
-                (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
-                <button class="remove_student" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}">x</button>
-                </form>
+                {% if 'students' in class_list[class_id] %}
+                  <ul>
+                    {% for student in class_list[class_id]['students'] %}
+                    <li>
+                    {{ student.first_name }} {{ student.last_name }} 
+                    (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
+                    <button class="remove_student" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}">x</button>
+                    </form>
 
-                </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-    {% endfor %}
-    </ul>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
 
     <h3>Add student by username</h3>
     <form action="/add_student" method="POST">
@@ -123,11 +125,9 @@
 
     function deleteClass(evt) {
       evt.preventDefault();
-
       var formValues = {
         'class_id' : $(this).attr('data-classid')
       };
-
       if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
         $.post("/delete_class", formValues, confirmDelete);
       }
