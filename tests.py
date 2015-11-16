@@ -37,7 +37,13 @@ class TestClassList(unittest.TestCase):
         listing = self.browser.find_element_by_id("class-list")
         self.assertIn("Test Class", listing.text)
 
+    """Remove student / class"""
 
+    """Add student by username"""
+
+    """Create student account"""
+
+    
 
 if __name__ == "__main__":
     unittest.main()

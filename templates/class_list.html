@@ -20,7 +20,7 @@
 
             <li><b>{{ class_list[class_id]['class_name'] }}</b> 
             <button class="delete_class" data-classid="{{ class_id }}">x</button>
-            </li></form>
+            </li>
 
                 {% if 'students' in class_list[class_id] %}
                   <ul>
@@ -29,7 +29,7 @@
                     {{ student.first_name }} {{ student.last_name }} 
                     (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
                     <button class="remove_student" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}">x</button>
-                    </form>
+                    
 
                     </li>
                     {% endfor %}

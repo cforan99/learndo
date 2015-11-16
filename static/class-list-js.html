@@ -11,86 +11,177 @@
         width: 300px;
     }
     #select-form {
-    	width: 300px;
-    	text-align: center;
-    	padding: 10px;
+        width: 300px;
+        text-align: center;
+        padding: 10px;
     }
     </style>
 </head>
 <body>
+<div id="flash" class="alert alert-info" role="alert"></div>
 <div id="select-form">
-	<button id="new-class">New Class</button>
-	<button id="add-student">Add Student</button>
-	<button id="new-student">New Student</button>
+    <button id="new-class">New Class</button>
+    <button id="add-student">Add Student</button>
+    <button id="new-student">New Student</button>
 </div>
 <div id="classes-forms">
-	<div class="new-class content">
-		<h3>Add a new class</h3>
-		<form action="/new-class" method="POST">
-		    <div>
-		        <label>Class name:
-		            <input type="text" name="class-name" required>
-		        </label>
-		        <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-		        <input type="submit" id="create-class" value="Create">
-		    </div>
-		</form>
-	</div>
-	<div class="add-student content">
-		<h3>Add student by username</h3>
-<!-- 		<form action="/add-student-js" method="POST">
-		    <div>
-		        <label>Username:
-		            <input type="text" name="username" required>
-		        </label><br>
-		        <select name="class-id">
-		          {% for class_id in class_list.keys() %}
-		          <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
-		          {% endfor %}
-		        </select>
-		        <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-		        <input type="submit" value="Add to class">
-		    </div>
-		</form> -->
-	</div>
-	<div class="new-student content">
-		<h3>Create new student account</h3>
-	</div>
+    <div class="new-class content">
+        <h3>Add a new class</h3>
+        <form id="new-class-form" method="POST">
+            <div>
+                <label>Class name:
+                    <input type="text" id="class-name" name="class-name" required>
+                </label>
+                <input type="submit" id="create-class" value="Create">
+            </div>
+        </form>
+    </div>
+    <div class="add-student content">
+        <h3>Add student by username</h3>
+<!--        <form action="/add-student-js" method="POST">
+            <div>
+                <label>Username:
+                    <input type="text" name="username" required>
+                </label><br>
+                <select name="class-id">
+                  {% for class_id in class_list.keys() %}
+                  <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
+                  {% endfor %}
+                </select>
+                <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+                <input type="submit" value="Add to class">
+            </div>
+        </form> -->
+    </div>
+    <div class="new-student content">
+        <h3>Create new student account</h3>
+    </div>
 </div>
 <div id="class-list">
-	<h3>Your classes</h3>
-		<ul id="list-class"></ul>
+    <h3>Your classes</h3>
+        <ul id="list-class"></ul>
 </div>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script type="text/javascript">
-	// clicking on button reveals that form
-	$( "button" ).click(function() {
-	    $(".content").hide();
-	    var form = $(this).attr('id');
-	    $('.'+form+'.content').slideDown();
-	});
+    // Get class list as JSON when DOM is ready
+    $(document).ready(function() {
+        $.get("http://localhost:5000/class-list-js", generateClassList);
+    });
+
+
+
+    // clicking on button reveals that form
+    $( "button" ).click(function() {
+        $(".content").hide();
+        var form = $(this).attr('id');
+        $('.'+form+'.content').slideDown();
+    });
+
+    // for AJAX version of flash messages
+    function showConfirmation(message) {
+        $("#flash").empty();
+        $("#flash").html(message);
+        setTimeout(function(){
+            $("#flash").slideUp();
+        }, 10000);
+    }
 
     // Iterate over class list
     function generateClassList(data) {
-    	var classes = data;
-    	for (eachClass in classes) {
-    		$("#list-class").append("<li id='c"+eachClass+"'>"+classes[eachClass]['class_name']+"</li>");
-    		$("li#c"+eachClass).append("<ul class='students'>");
-    		for (student in classes[eachClass]['students']) {
-    			first = classes[eachClass]['students'][student]['first'];
-    			last = classes[eachClass]['students'][student]['last'];
-    			$("li#c"+eachClass+" ul.students").append("<li id='s"+student+"'>"+first+" "+last+"</li>");
-    		}
-    		$("li#c"+eachClass).append("</ul>");
 
+        var classes = data;
 
-    	}
+        $("#list-class").empty();
+
+        // Append class name as list item in ul with a button to delete it
+        for (var eachClass in classes) {
+            
+            var classButton = "<input type='button' id='class"+eachClass+"' class='delete-class' data_classid='"+eachClass+"' value='x'>";
+            
+            // var classButton = "<button class='delete-class' data_classid='"+eachClass+"' onclick='buttonClicked(evt)'>x</button>"
+
+            $("#list-class").append("<li id='c"+eachClass+"'>"+classes[eachClass]['class_name']+" "+classButton+"</li>");
+
+            $("li#c"+eachClass).append("<ul class='students'>");
+
+            // Append each student's first and last name to the new ul for the class with
+            // a link to their profile and a button to remove them from a class.
+            for (var student in classes[eachClass]['students']) {
+
+                var first = classes[eachClass]['students'][student]['first'];
+                var last = classes[eachClass]['students'][student]['last'];
+                var username = classes[eachClass]['students'][student]['username'];
+
+                var studentButton = "<button class='remove-student' data-classid='"+eachClass+"' data-studentid='"+student+"'>x</button>";
+
+                $("li#c"+eachClass+" ul.students").append("<li id='s"+student+"'>"+first+" "+last+" (<a href='http://localhost:5000/profile/"+student+"'>"+username+"</a>) "+studentButton+"</li>");
+            }
+            $("li#c"+eachClass).append("</ul>");
+        }
+        $(".new-class").slideUp("fast")
+
+        $("body").on("click", "input.delete-class", deleteClass);
+
     }
 
-    // Get class list as JSON
-    $.get("http://localhost:5000/class-list-js", generateClassList);
+    // Submit create class form
+    function postClassName(evt) {
+        evt.preventDefault();
+        var formValues = {
+          'class_name' : $("#class-name").val(),
+          'teacher' : '7'
+        };
+        $.post("http://localhost:5000/new-class-js", formValues, generateClassList);
+
+        showConfirmation("Your class has been added.")
+    }
+
+    // Listens for new class form submission
+    $("#new-class-form").submit(postClassName);
+
+
+    function deleteClass() {
+
+      // var id = this.id;
+
+      var id = $(this).attr("data_classid");
+
+      if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
+        $.post("http://localhost:5000/delete-class-js", { class_id : id }, showConfirmation);
+        $("li#c"+id).remove();
+        // alert("{ class_id :"+formValues+"}");
+      }
+    }
+
+
+    function buttonClicked() {
+        var data = $(this).attr("data_classid")
+        alert(data);
+    }
+
+    // Listens for the delete class button to be clicked
+
+    // function removeStudent(evt) {
+
+    //   evt.preventDefault();
+
+    //   var formValues = {
+    //     'class_id' : $(this).attr('data-classid'),
+    //     'user_id' : $(this).attr('data-studentid')
+    //   };
+
+    //   if (confirm('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')) {
+    //     $.post("http://localhost:5000/remove_student_js", formValues, showConfirmation);
+    //   }
+    // }
+
+    // // Listens for the remove student button to be clicked
+    // $("button.remove-student").click(removeStudent);
+
+
+
 
 </script>
 </body>

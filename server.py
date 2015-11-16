@@ -26,7 +26,7 @@ def manage_classes_js(user_id):
     """Shows class lists and student lists. Teacher can also add classes and students."""
 
     if session['user_id'] == user_id:
-        return render_template("/class-list-js.html")
+        return render_template("/static/class-list-js.html") #FIX ME: Move this to templates folder
     else:
         flash("You do not have access to that page.")
         return redirect("/")
@@ -36,6 +36,8 @@ def generate_class_list():
     """Creates a json object with class list info."""
 
     # if session['user_id'] == user_id:
+    session['user_id'] = 7
+    session['acct_type'] = 'teacher'
 
     teacher = User.query.get(7)
     class_list = json_classes(teacher)
@@ -51,16 +53,13 @@ def create_class_js():
     class_name = request.form.get("class_name")
 
     # Create a new class in db and add the teacher to the class.
-    if session['acct_type'] == 'teacher':
-        teacher = User.query.get(user_id)
-        add_class(teacher, class_name)
+    teacher = User.query.get(user_id)
+    add_class(teacher, class_name)
 
-        flash("{} has been added.".format(class_name))
-        return redirect('/teacher/{}/classes'.format(user_id))
-    
-    else:
-        flash("You are not authorized to make this change.")
-        return redirect("/")
+    # Generate a new class list and return it
+    class_list = json_classes(teacher)
+
+    return jsonify(class_list)
 
 
 @app.route('/add-student-js', methods=['POST'])
@@ -114,13 +113,11 @@ def delete_class_js():
     if authorized:
         db.session.delete(this_class)
         db.session.commit()
-        # Why are the next two lines not being run?
-        flash("The class, {}, has been deleted.".format(this_class.class_name))
-        return redirect('/teacher/{}/classes'.format(session['user_id']))
+
+        return "That class has been deleted"
     # This does run after the confirm popup.
     else:
-        flash("You are not authorized to make this change.")
-        return redirect("/")
+        return "You are not authorized to make this change."
 
 
 @app.route('/remove-student-js', methods=["POST"])
@@ -139,12 +136,10 @@ def remove_student_js():
         db.session.delete(user_class)
         db.session.commit()
 
-        flash("{} has been removed from that class.".format(this_student.display_name))
-        return redirect('/teacher/{}/classes'.format(session['user_id']))
+        return "That student has been removed from your class."
 
     else:
-        flash("You are not authorized to make this change.")
-        return redirect("/")
+        return "You are not authorized to make this change."
     
 
 @app.route('/new-student-js', methods=['POST'])
@@ -517,12 +512,17 @@ def load_profile(user_id):
 
     user = User.query.get(user_id)
 
+    if user.is_teacher:
+        acct_type = 'teacher'
+    else:
+        acct_type = 'student'
+
     my_classes = []
     for each_class in user.classes:
         my_classes.append(each_class.class_name)
 
     if access_profile(user_id) == True:
-        return render_template("profile.html", user=user, my_classes=my_classes, acct_type=session['acct_type'])
+        return render_template("profile.html", user=user, my_classes=my_classes, acct_type=acct_type)
     else:
         flash("You do not have access to that page.")
         return redirect("/")
