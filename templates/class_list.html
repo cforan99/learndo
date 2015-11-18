@@ -1,46 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
+<div id="select-form">
+    <button id="new-class" class="form-buttons">New Class</button>
+    <button id="add-student" class="form-buttons">Add Student</button>
+    <button id="new-student" class="form-buttons">New Student</button>
+</div>
 
-    <h2>Your Classes</h2>
+<div id="classes-forms">
+    <div class="new-class content">
     <h3>Add a new class</h3>
-    <form action="/new_class" method="POST">
+    <form action="/new_class" method="POST" id="new-class-form">
         <div>
             <label>Class name:
                 <input type="text" name="class_name" required>
             </label>
             <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-            <input type="submit" id="create-class" value="Create">
+            <input id="new-class-button" type="submit" id="create-class" value="Create">
         </div>
     </form>
-    
-    <div id="class-list">
-        <h3 id="your-classes">Your classes</h3>
-        <ul>
-        {% for class_id in class_list.keys() %}
-
-            <li><b>{{ class_list[class_id]['class_name'] }}</b> 
-            <button class="delete_class" data-classid="{{ class_id }}">x</button>
-            </li>
-
-                {% if 'students' in class_list[class_id] %}
-                  <ul>
-                    {% for student in class_list[class_id]['students'] %}
-                    <li>
-                    {{ student.first_name }} {{ student.last_name }} 
-                    (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
-                    <button class="remove_student" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}">x</button>
-                    
-
-                    </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-        {% endfor %}
-        </ul>
     </div>
 
+    <div class="add-student content">
     <h3>Add student by username</h3>
-    <form action="/add_student" method="POST">
+    <form action="/add_student" method="POST" id="add-student-form">
         <div>
             <label>Username:
                 <input type="text" name="username" required>
@@ -51,13 +33,15 @@
               {% endfor %}
             </select>
             <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-            <input type="submit" value="Add to class">
+            <input id="add-student-button" type="submit" value="Add to class">
         </div>
     </form>
+    </div>
 
+    <div class="new-student content">
     <h3>Create new student account</h3>
 
-    <form action="/new_student" method="POST">
+    <form action="/new_student" method="POST" id="new-student-form">
     <div>
         <label>
             First name: 
@@ -111,46 +95,91 @@
 
     <div>
         <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-        <input type="submit" value="Create Account">
+        <input id="new-student-button" type="submit" value="Create Account">
     </div>
 </form>
+</div>
+</div>
+    
+    <div id="class-list">
+        <h3 id="your-classes">Your classes</h3>
+        <ul>
+        {% for class_id in class_list.keys() %}
+
+            <li id="c{{ class_id }}"><b>{{ class_list[class_id]['class_name'] }}</b> 
+            <button class="delete_class" data-classid="{{ class_id }}">x</button>
+            </li>
+
+                {% if 'students' in class_list[class_id] %}
+                  <ul id="class{{ class_id }}">
+                    {% for student in class_list[class_id]['students'] %}
+                    <li id="s{{ student.user_id }}">
+                    {{ student.first_name }} {{ student.last_name }} 
+                    (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
+                    <button class="remove_student" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}">x</button>
+                    
+
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
+
+
 {% endblock %} 
 
 {% block js %}
 <script>
-    function confirmDelete(result) {
-        window.location.reload()
-        console.log("Class deleted successfully!");
+    // clicking on button reveals that form
+    $( ".form-buttons" ).click(function() {
+        var form = $(this).attr('id');
+        $('.'+form+'.content').slideToggle();
+        $(this).siblings().each( function() { $('.'+this.id+'.content').hide();} );
+    });
+
+    // for AJAX version of flash messages
+    function showConfirmation(message) {
+
+        $("#flash").empty();
+        $("#flash").slideDown();
+        $("#flash").html(message);
+        setTimeout(function(){
+            $("#flash").slideUp();
+        }, 5000);
     }
+
 
     function deleteClass(evt) {
       evt.preventDefault();
+      var classid = $(this).attr('data-classid');
       var formValues = {
         'class_id' : $(this).attr('data-classid')
       };
       if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
-        $.post("/delete_class", formValues, confirmDelete);
+        $.post("/delete_class", formValues, showConfirmation);
+        $("li#c"+classid).remove();
+
       }
     }
 
     $("button.delete_class").on("click", deleteClass);
 
-
-    function confirmRemove(result) {
-      window.location.reload()
-      console.log("Student deleted successfully!");
-    }
-
     function removeStudent(evt) {
       evt.preventDefault();
 
+      var studentid = $(this).attr('data-studentid');
+      var classid = $(this).attr('data-classid');
       var formValues = {
         'class_id' : $(this).attr('data-classid'),
         'user_id' : $(this).attr('data-studentid')
       };
 
       if (confirm('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')) {
-        $.post("/remove_student", formValues, confirmRemove);
+        $.post("/remove_student", formValues, showConfirmation);
+        console.log(studentid)
+        $("ul#class"+classid+" li#s"+studentid).remove();
       }
     }
 

@@ -70,8 +70,6 @@
         $.get("http://localhost:5000/class-list-js", generateClassList);
     });
 
-
-
     // clicking on button reveals that form
     $( "button" ).click(function() {
         $(".content").hide();
@@ -114,7 +112,7 @@
                 var last = classes[eachClass]['students'][student]['last'];
                 var username = classes[eachClass]['students'][student]['username'];
 
-                var studentButton = "<button class='remove-student' data-classid='"+eachClass+"' data-studentid='"+student+"'>x</button>";
+                var studentButton = "<input type='button'id='student"+student+"' class='remove-student' data-classid='"+eachClass+"' data-studentid='"+student+"' value='x'>";
 
                 $("li#c"+eachClass+" ul.students").append("<li id='s"+student+"'>"+first+" "+last+" (<a href='http://localhost:5000/profile/"+student+"'>"+username+"</a>) "+studentButton+"</li>");
             }
@@ -123,6 +121,8 @@
         $(".new-class").slideUp("fast")
 
         $("body").on("click", "input.delete-class", deleteClass);
+
+        // $("body").on("click", ".remove-student", removeStudent);
 
     }
 
@@ -136,30 +136,52 @@
         $.post("http://localhost:5000/new-class-js", formValues, generateClassList);
 
         showConfirmation("Your class has been added.")
+
+        $("#class-name").val("")
     }
 
     // Listens for new class form submission
     $("#new-class-form").submit(postClassName);
 
 
-    function deleteClass() {
+    function deleteClass(evt) {
+
+      evt.stopImmediatePropagation();
 
       // var id = this.id;
 
-      var id = $(this).attr("data_classid");
+      var id = $(this).attr("data-classid");
 
       if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
-        $.post("http://localhost:5000/delete-class-js", { class_id : id }, showConfirmation);
-        $("li#c"+id).remove();
-        // alert("{ class_id :"+formValues+"}");
+        // $.post("http://localhost:5000/delete-class-js", { class_id : id }, showConfirmation);
+
+        alert(id);
+        // $("li#c"+cid).remove();
+
       }
     }
 
+    // function removeStudent() {
 
-    function buttonClicked() {
-        var data = $(this).attr("data_classid")
-        alert(data);
-    }
+    //   // evt.stopImmediatePropagation();
+
+    //   // var id = this.id;
+
+    //   var cid = $(this).data("classid");
+    //   var sid = $(this).data("studentid");
+
+    //   if (confirm('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')) {
+    //     $.post("http://localhost:5000/remove-student-js", { class_id : cid, student_id : sid }, showConfirmation);
+
+    //     $("li#c"+cid+" li#s"+sid).remove();
+    //     // alert("{ class_id : "+cid+", student_id : "+sid+" }");
+    //   }
+    // }
+
+    // function buttonClicked() {
+    //     var data = $(this).attr("data_classid")
+    //     alert(data);
+    // }
 
     // Listens for the delete class button to be clicked
 

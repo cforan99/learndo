@@ -16,7 +16,17 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link href="/static/style.css" rel="stylesheet">
+    <style>
+    .content {
+        display:none;
+        padding: 10px;
+        width: 350px;
+    }
+    #flash {
+    	display:none;
+    }
+
+    </style>
 
 </head>
 <body>
@@ -73,11 +83,12 @@
       	<div class="col-lg-3 col-md-2 col-xs-1"></div>
       	<div class="col-lg-6 col-md-8 col-xs-10">
 
-		{% for flash in get_flashed_messages() %}
-		  <div id="flash" class="alert alert-info" role="alert">
+		<div id="flash" class="alert alert-info" role="alert">
+		  {% for flash in get_flashed_messages() %}
 		  {{ flash }}
-		  </div>
-		{% endfor %}
+		  {% endfor %}
+		</div>
+		
 
         {% block content %}
             Put your body here.
@@ -93,6 +104,13 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha256-Sk3nkD6mLTMOF0EOpNtsIry+s1CsaqQC1rVLTAy+0yc= sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <script>
+    $(document).ready(function() {
+      if ($.trim($("#flash").html())!='') { $("#flash").slideDown(); }
+      setTimeout( function(){ $("#flash").slideUp();
+        }, 5000);
+    })
+    </script>
     {% block js %}
         <script></script>
     {% endblock %}
