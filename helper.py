@@ -153,53 +153,49 @@ def report_student_progress(task, assignment_list):
 
     return student_progress
 
-def create_assignment_list(assignments_list, sort):
+def create_assignment_list(assignments_list):
     """Generates a dictionary with all the info needed for the assignment list feature."""
 
-    assignments = {}
+    assignments = { 'list' : [] }
 
     if session['acct_type'] == 'student':
 
         for assignment in assignments_list:
-
-            if sort == 'new':
-                dt = assignment.assigned
-                ut = (dt - datetime(1970,1,1)).total_seconds()
-            if sort == 'due':
-                dt = assignment.task.due_date
-                ut = (dt - datetime(1970,1,1)).total_seconds()
-                ut = ut + float("."+str(assignment.task_id))
             
-            assignments[ut] = {}
-            assignments[ut]['id'] = assignment.assign_id
-            assignments[ut]['title'] = assignment.task.title
-            assignments[ut]['goal'] = assignment.task.goal
-            assignments[ut]['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
-            assignments[ut]['assigned_by'] = db.session.query(User.display_name).filter(
-                                             User.user_id == (assignments_list[0].task.created_by)).first()
-            assignments[ut]['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
-            assignments[ut]['status'] = check_student_status(assignment)
+            to_add = {}
+            to_add['id'] = assignment.assign_id
+            to_add['ad'] = (assignment.assigned - datetime(1970,1,1)).total_seconds()
+            dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
+            to_add['dd'] = dd + float("."+str(assignment.task_id))
+            to_add['title'] = assignment.task.title
+            to_add['goal'] = assignment.task.goal
+            to_add['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
+            to_add['assigned_by'] = db.session.query(User.display_name).filter(
+                                    User.user_id == (assignments_list[0].task.created_by)).first()[0]
+            to_add['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
+            to_add['status'] = check_student_status(assignment)
+
+            assignments['list'].append(to_add)
 
     if session['acct_type'] == 'teacher':
 
         for assignment in assignments_list:
 
-            if sort == 'new':
-                dt = assignment.assigned
-                ut = (dt - datetime(1970,1,1)).total_seconds()
-            if sort == 'due':
-                dt = assignment.task.due_date
-                ut = (dt - datetime(1970,1,1)).total_seconds()
-                ut = ut + float("."+str(assignment.task_id))
+            to_add = {}
+            to_add['id'] = assignment.assign_id
+            to_add['ad'] = (assignment.assigned - datetime(1970,1,1)).total_seconds()
+            dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
+            to_add['dd'] = dd + float("."+str(assignment.task_id))
+            to_add['title'] = assignment.task.title
+            to_add['goal'] = assignment.task.goal
+            to_add['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
+            to_add['assigned_to'] = find_class_by_task(assignment.task.task_id)
+            to_add['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
+            to_add['status'] = check_class_status(assignment)
 
-            assignments[ut] = {}
-            assignments[ut]['id'] = assignment.assign_id
-            assignments[ut]['title'] = assignment.task.title
-            assignments[ut]['goal'] = assignment.task.goal
-            assignments[ut]['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
-            assignments[ut]['assigned_to'] = find_class_by_task(assignment.task.task_id)
-            assignments[ut]['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
-            assignments[ut]['status'] = check_class_status(assignment)
+            assignments['list'].append(to_add)
+
+    print assignments
 
     return assignments
 

@@ -431,27 +431,16 @@ def show_student_assignments(user_id):
         flash("You do not have access to that page.")
         return redirect("/")
 
-@app.route('/newest.json')
+@app.route('/list.json')
 def sort_by_assigned():
-    """Returns a list of assignments for the user_id in session sorted by the 
-    assigned date as a JSON object."""
+    """Returns a list of assignments for the user_id in session as a JSONifiable array of objects."""
 
     user = User.query.get(session['user_id'])
     assignments_list = user.assignments
-    assignments = create_assignment_list(assignments_list, 'new')
+    assignments = create_assignment_list(assignments_list)
 
-    return jsonify(assignments)
-
-
-@app.route('/duedate.json')
-def sort_by_duedate():
-    """Returns a list of assignments for the user_id in session sorted by the 
-    due date as a JSON object."""
-
-    user = User.query.get(session['user_id'])
-    assignments_list = user.assignments
-    assignments = create_assignment_list(assignments_list, 'due')
-
+    print assignments
+    
     return jsonify(assignments)
 
 

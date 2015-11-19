@@ -26,36 +26,32 @@
 	var sid = "{{ sid }}";
 
     $(document).ready(function() {
-        $.get("http://localhost:5000/newest.json", setCurrentData);
+        $.get("http://localhost:5000/list.json", setCurrentData);
     });
 
     // Generate list of assignments ordered by newest
-
+    // Instead, make an array of objects and use .sort
+    // Run for filter as well
 	function generateList(data) {
 		// order data from oldest to newest 
-		var orderedAssignments = {};
-		currentDataKeys.forEach(function(key) {
-			orderedAssignments[key] = data[key];
-		});
+		// var orderedAssignments = {};
+		// currentDataKeys.forEach(function(key) {
+		// 	orderedAssignments[key] = data[key];
+		// });
 
-		console.log(orderedAssignments);
+		console.log(data.list);
 
-		for (assignment in orderedAssignments) {
-			aid = orderedAssignments[assignment]['id'];
-			title = orderedAssignments[assignment]['title'];
-			goal = orderedAssignments[assignment]['goal'];
-			dueDate = orderedAssignments[assignment]['due_date'];
-			assignedBy = orderedAssignments[assignment]['assigned_by'];
-			assignedOn = orderedAssignments[assignment]['assigned_on'];
-			status = orderedAssignments[assignment]['status'];
+		// 
+		for (assignment in data.list) {
+			assignment = data.list[assignment];
 
 			$(".assignments").prepend(
 
-				"<div id='"+aid+"' class="+status+">\
-					<h3><a href='/student/"+sid+"/assignments/"+aid+"'>"+title+"</a></h3>\
-					<p><b>Due date: "+dueDate+"</b></p>\
-					<p>"+goal+"</p>\
-					<p><i>Assigned by "+assignedBy+" on "+assignedOn+"</i></p><br>\
+				"<div id='"+assignment.id+"' class="+assignment.status+">\
+					<h3><a href='/student/"+sid+"/assignments/"+assignment.id+"'>"+assignment.title+"</a></h3>\
+					<p><b>Due date: "+assignment.due_date+"</b></p>\
+					<p>"+assignment.goal+"</p>\
+					<p><i>Assigned by "+assignment.assigned_by+" on "+assignment.assigned_on+"</i></p><br>\
 				</div>"
 
 				);

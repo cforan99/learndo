@@ -122,7 +122,7 @@
 
         $("body").on("click", "input.delete-class", deleteClass);
 
-        // $("body").on("click", ".remove-student", removeStudent);
+        $("body").on("click", ".remove-student", removeStudent);
 
     }
 
@@ -156,27 +156,27 @@
         // $.post("http://localhost:5000/delete-class-js", { class_id : id }, showConfirmation);
 
         alert(id);
-        // $("li#c"+cid).remove();
+        $("li#c"+cid).remove();
 
       }
     }
 
-    // function removeStudent() {
+    function removeStudent() {
 
-    //   // evt.stopImmediatePropagation();
+      // evt.stopImmediatePropagation();
 
-    //   // var id = this.id;
+      // var id = this.id;
 
-    //   var cid = $(this).data("classid");
-    //   var sid = $(this).data("studentid");
+      var cid = $(this).data("classid");
+      var sid = $(this).data("studentid");
 
-    //   if (confirm('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')) {
-    //     $.post("http://localhost:5000/remove-student-js", { class_id : cid, student_id : sid }, showConfirmation);
+      if (confirm('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')) {
+        $.post("http://localhost:5000/remove-student-js", { class_id : cid, student_id : sid }, showConfirmation);
 
-    //     $("li#c"+cid+" li#s"+sid).remove();
-    //     // alert("{ class_id : "+cid+", student_id : "+sid+" }");
-    //   }
-    // }
+        $("li#c"+cid+" li#s"+sid).remove();
+        // alert("{ class_id : "+cid+", student_id : "+sid+" }");
+      }
+    }
 
     // function buttonClicked() {
     //     var data = $(this).attr("data_classid")
