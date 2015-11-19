@@ -401,6 +401,20 @@ def show_teacher_assignments(user_id):
         flash("You do not have access to that page.")
         return redirect("/")
 
+############## TEST ROUTE #################
+
+@app.route('/student/<int:user_id>/assignments-js')
+def test_student_assignments(user_id):
+    """Lists assignments assigned to a student"""
+
+    if session['user_id'] == user_id:
+        return render_template("sassignments-js.html", sid=session['user_id'])
+
+    else:
+        flash("You do not have access to that page.")
+        return redirect("/")
+
+############### END TEST ROUTE ##################
 
 @app.route('/student/<int:user_id>/assignments')
 def show_student_assignments(user_id):

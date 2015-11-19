@@ -176,7 +176,7 @@ def create_assignment_list(assignments_list, sort):
             assignments[ut]['goal'] = assignment.task.goal
             assignments[ut]['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
             assignments[ut]['assigned_by'] = db.session.query(User.display_name).filter(
-                                             User.user_id == (al[0].task.created_by)).first()
+                                             User.user_id == (assignments_list[0].task.created_by)).first()
             assignments[ut]['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
             assignments[ut]['status'] = check_student_status(assignment)
 
