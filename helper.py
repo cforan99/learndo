@@ -152,3 +152,89 @@ def report_student_progress(task, assignment_list):
                                              'overdue' : overdue }
 
     return student_progress
+
+def create_assignment_list(assignments_list, sort):
+    """Generates a dictionary with all the info needed for the assignment list feature."""
+
+    assignments = {}
+
+    if session['acct_type'] == 'student':
+
+        for assignment in assignments_list:
+
+            if sort == 'new':
+                dt = assignment.assigned
+                ut = (dt - datetime(1970,1,1)).total_seconds()
+            if sort == 'due':
+                dt = assignment.task.due_date
+                ut = (dt - datetime(1970,1,1)).total_seconds()
+                ut = ut + float("."+str(assignment.task_id))
+            
+            assignments[ut] = {}
+            assignments[ut]['id'] = assignment.assign_id
+            assignments[ut]['title'] = assignment.task.title
+            assignments[ut]['goal'] = assignment.task.goal
+            assignments[ut]['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
+            assignments[ut]['assigned_by'] = db.session.query(User.display_name).filter(
+                                             User.user_id == (al[0].task.created_by)).first()
+            assignments[ut]['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
+            assignments[ut]['status'] = check_student_status(assignment)
+
+    if session['acct_type'] == 'teacher':
+
+        for assignment in assignments_list:
+
+            if sort == 'new':
+                dt = assignment.assigned
+                ut = (dt - datetime(1970,1,1)).total_seconds()
+            if sort == 'due':
+                dt = assignment.task.due_date
+                ut = (dt - datetime(1970,1,1)).total_seconds()
+                ut = ut + float("."+str(assignment.task_id))
+
+            assignments[ut] = {}
+            assignments[ut]['id'] = assignment.assign_id
+            assignments[ut]['title'] = assignment.task.title
+            assignments[ut]['goal'] = assignment.task.goal
+            assignments[ut]['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
+            assignments[ut]['assigned_to'] = find_class_by_task(assignment.task.task_id)
+            assignments[ut]['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
+            assignments[ut]['status'] = check_class_status(assignment)
+
+    return assignments
+
+
+def check_student_status(assignment):
+    """Checks assignment object for status as viewed, completed, or overdue."""
+    if assignment.viewed: 
+        if assignment.completed:
+            status = 'completed'
+        elif datetime.now() > assignment.task.due_date:
+            status = 'overdue'
+        else: 
+            status = 'viewed'
+    else:
+        status = 'inactive'
+    return status
+
+
+def check_class_status(assignment):
+    """Checks assignment object for status as viewed, completed, or overdue."""
+
+    if assignment.assigned: 
+        student_assignments = Assignment.query.filter(Assignment.task_id == assignment.task_id).all()
+        for assignment in student_assignments:
+            if assignment.student_id != session['user_id']:
+                if assignment.completed == None:
+                    if datetime.now() > assignment.task.due_date:
+                        status = 'overdue'
+                        break
+                    else:
+                        status = 'viewed'
+                        break
+                elif assignment.completed:
+                    status = 'completed'
+    else:
+        status = 'inactive'
+
+    return status

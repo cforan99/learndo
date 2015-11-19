@@ -147,20 +147,6 @@ def logout():
 #         return redirect("/")
 
 
-@app.route('/teacher/<int:user_id>/assignments')
-def show_teacher_assignments(user_id):
-    """Lists assignments created by a teacher"""
-
-    if session['user_id'] == user_id:
-        teacher = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-        tasks = teacher.tasks
-
-        return render_template("tassignments.html", teacher=teacher, tasks=tasks)
-    else:
-        flash("You do not have access to that page.")
-        return redirect("/")
-
-
 ############### CLASSES ###############
 @app.route('/teacher/<int:user_id>/classes')
 def manage_classes(user_id):
@@ -388,14 +374,29 @@ def edit_profile():
         return redirect('/profile/{}'.format(user_id))
 
 
-############### STUDENT VIEWS ###############
-@app.route('/student/<int:user_id>')
-def show_student_dashboard(user_id):
-    """Initially shows links to messages and tasks"""
+############### ASSIGNMENTS ###############
+# FIX ME: Re-route to profile page
+# @app.route('/student/<int:user_id>')
+# def show_student_dashboard(user_id):
+#     """Initially shows links to messages and tasks"""
+
+#     if session['user_id'] == user_id:
+#         student = User.query.get(user_id)  ## Can I make this a global variable or store in session?
+#         return render_template("sdashboard.html", student=student)
+#     else:
+#         flash("You do not have access to that page.")
+#         return redirect("/")
+
+
+@app.route('/teacher/<int:user_id>/assignments')
+def show_teacher_assignments(user_id):
+    """Lists assignments created by a teacher"""
 
     if session['user_id'] == user_id:
-        student = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-        return render_template("sdashboard.html", student=student)
+        teacher = User.query.get(user_id)  ## Can I make this a global variable or store in session?
+        tasks = teacher.tasks
+
+        return render_template("tassignments.html", teacher=teacher, tasks=tasks)
     else:
         flash("You do not have access to that page.")
         return redirect("/")
@@ -416,10 +417,34 @@ def show_student_assignments(user_id):
         flash("You do not have access to that page.")
         return redirect("/")
 
+@app.route('/newest.json')
+def sort_by_assigned():
+    """Returns a list of assignments for the user_id in session sorted by the 
+    assigned date as a JSON object."""
+
+    user = User.query.get(session['user_id'])
+    assignments_list = user.assignments
+    assignments = create_assignment_list(assignments_list, 'new')
+
+    return jsonify(assignments)
+
+
+@app.route('/duedate.json')
+def sort_by_duedate():
+    """Returns a list of assignments for the user_id in session sorted by the 
+    due date as a JSON object."""
+
+    user = User.query.get(session['user_id'])
+    assignments_list = user.assignments
+    assignments = create_assignment_list(assignments_list, 'due')
+
+    return jsonify(assignments)
+
 
 @app.route('/student/<int:student_id>/assignments/<int:assign_id>')
 def view_student_assignment(student_id, assign_id):
-    """Shows assignment information to student with a form to check that an assignment is complete"""
+    """Shows assignment information to student with a form to check that an 
+    assignment is complete"""
 
     assignment = Assignment.query.get(assign_id)
     task = assignment.task
@@ -461,9 +486,6 @@ def complete_assignment():
 
     return redirect("/student/{}/assignments/{}".format(assignment.student_id, assign_id))
 
-
-
-############### ASSIGNMENTS ###############
 
 @app.route('/new_assignment')
 def show_assignment_form():
