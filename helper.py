@@ -179,23 +179,40 @@ def create_assignment_list(assignments_list):
 
     if session['acct_type'] == 'teacher':
 
-        for assignment in assignments_list:
+        for task in assignments_list:
 
+            quantity = Assignment.query.filter(Assignment.task_id == task.task_id).all()
             to_add = {}
-            to_add['id'] = assignment.assign_id
-            to_add['ad'] = (assignment.assigned - datetime(1970,1,1)).total_seconds()
-            dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
-            to_add['dd'] = dd + float("."+str(assignment.task_id))
-            to_add['title'] = assignment.task.title
-            to_add['goal'] = assignment.task.goal
-            to_add['due_date'] = assignment.task.due_date.strftime("%A %m/%d/%y %I:%M %p")
-            to_add['assigned_to'] = find_class_by_task(assignment.task.task_id)
-            to_add['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
-            to_add['status'] = check_class_status(assignment)
 
-            assignments['list'].append(to_add)
+            if len(quantity) > 0:
+                assignment = Assignment.query.filter(Assignment.task_id == task.task_id, 
+                                                     Assignment.student_id == task.created_by).one()
+                to_add['id'] = assignment.assign_id
+                to_add['ad'] = (assignment.assigned - datetime(1970,1,1)).total_seconds()
+                dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
+                to_add['dd'] = dd + float("."+str(assignment.task_id))
+                to_add['title'] = task.title
+                to_add['goal'] = task.goal
+                to_add['due_date'] = task.due_date.strftime("%A %m/%d/%y %I:%M %p")
+                to_add['assigned_to'] = find_class_by_task(task.task_id)
+                to_add['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
+                to_add['status'] = check_class_status(assignment)
 
-    print assignments
+                assignments['list'].append(to_add)
+
+            else:
+                to_add['id'] = 'task' + str(task.task_id)
+                to_add['ad'] = 2000000000 + task.task_id
+                dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
+                to_add['dd'] = dd + float("."+str(assignment.task_id))
+                to_add['title'] = task.title
+                to_add['goal'] = task.goal
+                to_add['due_date'] = task.due_date.strftime("%A %m/%d/%y %I:%M %p")
+                to_add['assigned_to'] = 'no class yet'
+                to_add['assigned_on'] = 'no set date'
+                to_add['status'] = 'inactive'
+
+                assignments['list'].append(to_add)
 
     return assignments
 

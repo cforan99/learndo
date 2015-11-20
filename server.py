@@ -393,17 +393,13 @@ def show_teacher_assignments(user_id):
     """Lists assignments created by a teacher"""
 
     if session['user_id'] == user_id:
-        teacher = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-        tasks = teacher.tasks
-
-        return render_template("tassignments.html", teacher=teacher, tasks=tasks)
+        return render_template("tassignments.html", tid=session['user_id'])
     else:
         flash("You do not have access to that page.")
         return redirect("/")
 
-############## TEST ROUTE #################
 
-@app.route('/student/<int:user_id>/assignments-js')
+@app.route('/student/<int:user_id>/assignments')
 def test_student_assignments(user_id):
     """Lists assignments assigned to a student"""
 
@@ -414,34 +410,21 @@ def test_student_assignments(user_id):
         flash("You do not have access to that page.")
         return redirect("/")
 
-############### END TEST ROUTE ##################
-
-@app.route('/student/<int:user_id>/assignments')
-def show_student_assignments(user_id):
-    """Lists assignments assigned to a student"""
-
-    if session['user_id'] == user_id:
-        student = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-        assignments = db.session.query(Assignment).filter(Assignment.student_id == 
-            user_id).order_by(Assignment.assigned.desc()).all()
-
-        return render_template("sassignments.html", student=student, assignments=assignments)
-
-    else:
-        flash("You do not have access to that page.")
-        return redirect("/")
 
 @app.route('/list.json')
 def sort_by_assigned():
     """Returns a list of assignments for the user_id in session as a JSONifiable array of objects."""
 
-    user = User.query.get(session['user_id'])
-    assignments_list = user.assignments
-    assignments = create_assignment_list(assignments_list)
-
-    print assignments
-    
-    return jsonify(assignments)
+    if session['acct_type'] == 'student':
+        user = User.query.get(session['user_id'])
+        assignments_list = user.assignments
+        assignments = create_assignment_list(assignments_list)
+        return jsonify(assignments)
+    if session['acct_type'] == 'teacher':
+        user = User.query.get(session['user_id'])
+        assignments_list = Task.query.filter(Task.created_by == session['user_id']).all()
+        assignments = create_assignment_list(assignments_list)
+        return jsonify(assignments)
 
 
 @app.route('/student/<int:student_id>/assignments/<int:assign_id>')

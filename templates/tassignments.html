@@ -1,18 +1,131 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Your Assignments</h2>
-
-<div class="preview">
-	{% for task in tasks%}
-	<h3><a href="/teacher/{{ teacher.user_id }}/assignments/{{ task.task_id }}">
-	{{ task.title }}</a></h3>
-	<p>{{ task.goal }}</p>
-	<p><b>Due date:</b> {{ task.due_date.strftime("%m/%d/%y %I:%M %p") }} &nbsp; &nbsp; <b>Points:</b> {{ task.points }}</p>
-	<br>
-	{% endfor %}
+<div id="buttons">
+	<span id="sorting">
+	    <button id="newest" class="btn btn-default active">Newest</button>
+	    <button id="duedate" class="btn btn-default">Due Date</button>
+    </span>
+    <span id="filtering" class="pull-right">
+    	<button id="viewed" class="btn btn-default">In Progress</button>
+    	<button id="overdue" class="btn btn-default">Overdue</button>
+        <button id="completed" class="btn btn-default">Completed</button>
+        <button id="inactive" class="btn btn-default">Unassigned</button>
+	    <button id="show-all" class="btn btn-default active">All</button>
+	</span>
 </div>
 
-<br><br>
+<div class="heading"><h2>My assignments</h2></div>
 
+<div class="assignments"></div>
+
+
+{% endblock %}
+
+{% block js%}
+<script type="text/javascript">
+	var tid = "{{ tid }}";
+
+    $(document).ready(function() {
+        $.get("http://localhost:5000/list.json", setCurrentData);
+    });
+
+    $( ".btn" ).click(function() {
+        var id = $(this).attr('id');
+        $(this).addClass('active');
+        $(this).siblings().removeClass('active');
+        filterData(currentData);
+
+    });
+
+    function filterData(data) {
+    	
+    	var filter = $("#filtering .active").attr('id');
+
+    	if (filter === 'show-all') {
+    		sortData(data);
+    	} else {
+    		data = data.filter(function(el) { 
+    			return el.status === filter; })
+    		sortData(data);
+    	}
+    }
+
+    function sortData(data) {
+
+    	var sort = $("#sorting .active").attr('id');
+
+		if (sort === 'newest') {
+			data.sort(function (a, b) {
+			  if (a.ad < b.ad) {
+			    return 1;
+			  }
+			  if (a.ad > b.ad) {
+			    return -1;
+			  }
+			  // a must be equal to b
+			  return 0;
+			});
+		} else if (sort === 'duedate') {
+			data.sort(function (a, b) {
+			  if (a.dd < b.dd) {
+			    return 1;
+			  }
+			  if (a.dd > b.dd) {
+			    return -1;
+			  }
+			  // a must be equal to b
+			  return 0;
+			});
+		} 
+
+		generateList(data);
+    }		
+
+    // Generate list of assignments ordered by newest
+    // Instead, make an array of objects and use .sort
+    // Run for filter as well
+	function generateList(assignmentList) {
+		// order data from oldest to newest 
+		// var orderedAssignments = {};
+		// currentDataKeys.forEach(function(key) {
+		// 	orderedAssignments[key] = data[key];
+		// });
+
+		console.log(assignmentList);
+
+		$(".assignments").empty();
+
+		if (assignmentList.length == 0) {
+				$(".assignments").prepend("<p>No tasks to display</p>");
+
+		} else {
+			for (assignment in assignmentList) {
+			a = assignmentList[assignment];
+	
+			$(".assignments").prepend(
+
+				"<div id='"+a.id+"' class="+a.status+">\
+					<h3><a href='/student/"+tid+"/assignments/"+a.id+"'>"+a.title+"</a></h3>\
+					<p><b>Due date: "+a.due_date+"</b></p>\
+					<p>"+a.goal+"</p>\
+					<p><i>Assigned to "+a.assigned_to+" on "+a.assigned_on+"</i></p><br>\
+				</div>"
+
+				);
+			}
+		}
+	}
+
+	// Get and store current data
+
+
+	var currentData;
+
+	function setCurrentData(data) {
+		currentData = data.list;
+		filterData(currentData, 'show-all', 'newest');
+	}
+
+</script>
 {% endblock %}
