@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, request, flash, redirect, session, jsonify
+from flask import Flask, render_template, request, flash, redirect, session, jsonify, json
 from flask_debugtoolbar import DebugToolbarExtension
 from datetime import datetime
 
@@ -425,6 +425,32 @@ def sort_by_assigned():
         assignments_list = Task.query.filter(Task.created_by == session['user_id']).all()
         assignments = create_assignment_list(assignments_list)
         return jsonify(assignments)
+
+
+# @app.route('/checklist')
+# def check_for_new_assignments():
+#     """Takes a list of assignment ids from the client and compares it to the ones in the db for that 
+#     student. If there are different a new JSON object is returned, if not the 'No change' is sent."""
+
+#     current_data_ids = json.loads(data)
+#     print current_data_ids
+
+#     newest_data_ids = []
+#     assignments_list = Assignment.query.filter(Assignment.student_id == session['user_id']).all()
+
+#     for a in assignments_list:
+#         newest_data_ids.append(a.assign_id)
+
+#     newest_data_ids.sort()
+
+#     print newest_data_ids
+
+#     if current_data_ids == newest_data_ids:
+#         return 'No change'
+
+#     else:
+#         assignments = create_assignment_list(assignments_list)
+#         return jsonify(assignments)
 
 
 @app.route('/student/<int:student_id>/assignments/<int:assign_id>')

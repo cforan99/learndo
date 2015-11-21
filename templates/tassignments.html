@@ -22,7 +22,7 @@
 
 {% endblock %}
 
-{% block js%}
+{% block js %}
 <script type="text/javascript">
 	var tid = "{{ tid }}";
 
@@ -106,7 +106,7 @@
 			$(".assignments").prepend(
 
 				"<div id='"+a.id+"' class="+a.status+">\
-					<h3><a href='/student/"+tid+"/assignments/"+a.id+"'>"+a.title+"</a></h3>\
+					<h3><a href='/teacher/"+tid+"/assignments/"+a.id+"'>"+a.title+"</a></h3>\
 					<p><b>Due date: "+a.due_date+"</b></p>\
 					<p>"+a.goal+"</p>\
 					<p><i>Assigned to "+a.assigned_to+" on "+a.assigned_on+"</i></p><br>\

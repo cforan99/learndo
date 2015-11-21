@@ -22,11 +22,11 @@
 	<div class="assign">
 	  {% if class_name != None %}
 	  	<h3>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h3>
-	  	<table id="student-progress">
+	  	<table class="list-progress props xmpl" id="xtable">
 	  		<thead>
-	  			<tr><td>Student Name</td>
-	  			<td>Status</td>
-	  			<td>Timestamp</td>
+	  			<tr><th>Student Name</th>
+	  			<th>Status</th>
+	  			<th>Timestamp</th>
 	  			</tr>
 	  		</thead>
 	  		<tbody>
@@ -76,4 +76,43 @@
 	<br><br>
 	</div>
 	</div>
-	{% endblock %}
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.2.2/tinysort.min.js"></script>
+<script>
+var className = "{{ class_name }}";
+
+if (className !== "None") {
+	// from TinySort's table sorting example at http://tinysort.sjeiti.com/
+	var table = document.getElementById('xtable')
+	    ,tableHead = table.querySelector('thead')
+	    ,tableHeaders = tableHead.querySelectorAll('th')
+	    ,tableBody = table.querySelector('tbody')
+	;
+	tableHead.addEventListener('click',function(e){
+	    var tableHeader = e.target
+	        ,textContent = tableHeader.textContent
+	        ,tableHeaderIndex,isAscending,order
+	    ;
+	    if (textContent!=='add row') {
+	        while (tableHeader.nodeName!=='TH') {
+	            tableHeader = tableHeader.parentNode;
+	        }
+	        tableHeaderIndex = Array.prototype.indexOf.call(tableHeaders,tableHeader);
+	        isAscending = tableHeader.getAttribute('data-order')==='asc';
+	        order = isAscending?'desc':'asc';
+	        tableHeader.setAttribute('data-order',order);
+	        tinysort(
+	            tableBody.querySelectorAll('tr')
+	            ,{
+	                selector:'td:nth-child('+(tableHeaderIndex+1)+')'
+	                ,order: order
+	            }
+	        );
+	    }
+	});
+}
+</script>
+{% endblock %}

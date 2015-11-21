@@ -25,18 +25,21 @@
 <script type="text/javascript">
 	var sid = "{{ sid }}";
 
+	// Get intitial assignment list
     $(document).ready(function() {
         $.get("http://localhost:5000/list.json", setCurrentData);
     });
 
+    // Showing the selected sort/filter option
     $( ".btn" ).click(function() {
         var id = $(this).attr('id');
         $(this).addClass('active');
         $(this).siblings().removeClass('active');
         filterData(currentData);
-
     });
 
+
+    // Shows assignments with the same status as this id of the button that was clicked.
     function filterData(data) {
     	
     	var filter = $("#filtering .active").attr('id');
@@ -50,16 +53,17 @@
     	}
     }
 
+    // After filtered, the data can be sorted by newest assignment or due date.
     function sortData(data) {
 
     	var sort = $("#sorting .active").attr('id');
 
 		if (sort === 'newest') {
 			data.sort(function (a, b) {
-			  if (a.ad < b.ad) {
+			  if (a.ad > b.ad) {
 			    return 1;
 			  }
-			  if (a.ad > b.ad) {
+			  if (a.ad < b.ad) {
 			    return -1;
 			  }
 			  // a must be equal to b
@@ -81,15 +85,8 @@
 		generateList(data);
     }		
 
-    // Generate list of assignments ordered by newest
-    // Instead, make an array of objects and use .sort
-    // Run for filter as well
+    // Generate list of assignments after the CurrentData has been filtered and sorted.
 	function generateList(assignmentList) {
-		// order data from oldest to newest 
-		// var orderedAssignments = {};
-		// currentDataKeys.forEach(function(key) {
-		// 	orderedAssignments[key] = data[key];
-		// });
 
 		console.log(assignmentList);
 
@@ -117,14 +114,54 @@
 	}
 
 	// Get and store current data
-
-
 	var currentData;
+	var currentDataIds = [];
 
 	function setCurrentData(data) {
 		currentData = data.list;
-		filterData(currentData, 'show-all', 'newest');
+		currentDataIds = []
+		for (assignment in currentData) {
+			currentDataIds.push(currentData[assignment]['id']);
+		}
+		currentDataIds.sort();
+		console.log(currentDataIds);
+
+
+		filterData(currentData, 'show-all');
 	}
+
+	// Polling to see if a new assignment has been added for this student in the db.
+
+	(function poll(){
+	  if ($("#newest").hasClass("active")) {
+		setTimeout(function(){
+		  // AJAX request 
+		  $.get("http://localhost:5000/list.json", function(data){
+
+		  	var newestData = data.list;
+		  	var newestDataIds = [];
+		  	for (assignment in newestData) {
+		  		newestDataIds.push(newestData[assignment]['id']);
+		  	}
+		  	newestDataIds.sort();
+			console.log(newestDataIds);
+		  	
+		  	if (newestDataIds.join() != currentDataIds.join()) {
+		  		currentData = newestData;
+		  		currentDataIds = newestDataIds;
+		  		sortData(currentData);
+		  		console.log("Change");
+		  	} else {
+				console.log("No change");
+			}
+		  
+		    poll();
+
+		  });
+		}, 5000);
+	  }
+	})();
+
 
 </script>
 {% endblock %}

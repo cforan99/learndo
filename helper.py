@@ -187,7 +187,7 @@ def create_assignment_list(assignments_list):
             if len(quantity) > 0:
                 assignment = Assignment.query.filter(Assignment.task_id == task.task_id, 
                                                      Assignment.student_id == task.created_by).one()
-                to_add['id'] = assignment.assign_id
+                to_add['id'] = task.task_id
                 to_add['ad'] = (assignment.assigned - datetime(1970,1,1)).total_seconds()
                 dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
                 to_add['dd'] = dd + float("."+str(assignment.task_id))
@@ -201,7 +201,7 @@ def create_assignment_list(assignments_list):
                 assignments['list'].append(to_add)
 
             else:
-                to_add['id'] = 'task' + str(task.task_id)
+                to_add['id'] = task.task_id
                 to_add['ad'] = 2000000000 + task.task_id
                 dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
                 to_add['dd'] = dd + float("."+str(assignment.task_id))
