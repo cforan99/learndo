@@ -30,6 +30,7 @@
         $.get("http://localhost:5000/list.json", setCurrentData);
     });
 
+
     // Showing the selected sort/filter option
     $( ".btn" ).click(function() {
         var id = $(this).attr('id');
@@ -52,6 +53,7 @@
     		sortData(data);
     	}
     }
+
 
     // After filtered, the data can be sorted by newest assignment or due date.
     function sortData(data) {
@@ -85,6 +87,7 @@
 		generateList(data);
     }		
 
+
     // Generate list of assignments after the CurrentData has been filtered and sorted.
 	function generateList(assignmentList) {
 
@@ -113,38 +116,38 @@
 		}
 	}
 
+
 	// Get and store current data
+
 	var currentData;
 	var currentDataIds = [];
 
+	function listAssignmentIds(dataArray) {
+		var idList = [];
+		for (assignment in dataArray) {
+			idList.push(dataArray[assignment]['id']);
+		}
+		idList.sort();
+		console.log(idList);
+		return idList;
+	} 
+
 	function setCurrentData(data) {
 		currentData = data.list;
-		currentDataIds = []
-		for (assignment in currentData) {
-			currentDataIds.push(currentData[assignment]['id']);
-		}
-		currentDataIds.sort();
-		console.log(currentDataIds);
-
-
-		filterData(currentData, 'show-all');
+		currentDataIds = listAssignmentIds(currentData)
+		sortData(currentData);
 	}
 
-	// Polling to see if a new assignment has been added for this student in the db.
 
-	(function poll(){
+	// Polling to see if a new assignment has been added for this student in the db.
+	(function pollNewAsssignments(){
 	  if ($("#newest").hasClass("active")) {
 		setTimeout(function(){
 		  // AJAX request 
 		  $.get("http://localhost:5000/list.json", function(data){
 
 		  	var newestData = data.list;
-		  	var newestDataIds = [];
-		  	for (assignment in newestData) {
-		  		newestDataIds.push(newestData[assignment]['id']);
-		  	}
-		  	newestDataIds.sort();
-			console.log(newestDataIds);
+		  	newestDataIds = listAssignmentIds(newestData)
 		  	
 		  	if (newestDataIds.join() != currentDataIds.join()) {
 		  		currentData = newestData;
@@ -155,7 +158,7 @@
 				console.log("No change");
 			}
 		  
-		    poll();
+		    pollNewAsssignments();
 
 		  });
 		}, 5000);

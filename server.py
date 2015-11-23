@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request, flash, redirect, session, jsonify, json
 from flask_debugtoolbar import DebugToolbarExtension
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from model import connect_to_db, db, User, Class, Assignment, Task, UserClass
 from helper import *
@@ -147,7 +147,7 @@ def logout():
 #         return redirect("/")
 
 
-############### CLASSES ###############
+############### MANAGING CLASSES ###############
 @app.route('/teacher/<int:user_id>/classes')
 def manage_classes(user_id):
     """Shows class lists and student lists. Teacher can also add classes and students."""
@@ -489,9 +489,11 @@ def complete_assignment():
 
     if completed:
         assignment.completed = datetime.now()
+        assignment.viewed = datetime.now()
         flash("Congratulations on finishing! Your teacher has been notified.")
     else:
         assignment.completed = None
+        assignment.viewed = datetime.now()
         flash("Your teacher has been notified that you are still working.")
 
     db.session.commit()
@@ -598,6 +600,32 @@ def view_assignment(teacher_id, task_id):
     else:
         flash("You do not have access to that page.")
         return redirect("/")
+
+
+@app.route('/progress/<int:task_id>.json')
+def check_for_student_progress(task_id):
+    """Checks a list of assignments for a give task ID for recent changes and returns
+    the updated assignments as JSON objects."""
+
+    now = datetime.now()
+    then = now - timedelta(seconds = 5)
+
+    assignments_list = Assignment.query.filter(Assignment.task_id == task_id).all()
+
+    updated = []
+
+    for a in assignments_list:
+        if a.viewed != None and a.viewed >= then:
+            updated.append(a)
+
+    task = Task.query.get(task_id)
+    
+    progress = report_student_progress(task, updated)
+
+    if len(updated) > 0:
+        return jsonify(progress)
+    else:
+        return "None"
 
 
 @app.route('/teacher/<int:teacher_id>/assignments/<int:task_id>/edit', methods=["GET"])

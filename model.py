@@ -139,9 +139,18 @@ def connect_to_db(app):
 
     # Configure to use our SQLite database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///learndo.db'
-#    app.config['SQLALCHEMY_ECHO'] = True
+    # app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
+
+
+def delete_assignments(task_id):
+    """Deletes all assignments for a given task_id from db."""
+
+    to_delete = Assignment.query.filter(Assignment.task_id == task_id).all()
+    for assignment in to_delete:
+        db.session.delete(assignment)
+    db.session.commit()
 
 
 if __name__ == "__main__":

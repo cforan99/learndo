@@ -32,7 +32,7 @@
 	  		<tbody>
 
 	  		{% for s in progress %}
-	  			<tr><td class="name">{{ progress[s]['first'] }} {{ progress[s]['last'] }}</td>
+	  			<tr id="{{ s }}"><td class="name">{{ progress[s]['first'] }} {{ progress[s]['last'] }}</td>
 	  			{% if progress[s]['completed'] %}
 	  				<td class="completed">Done</td>
 	  				<td class="timestamp">Completed: {{ progress[s]['completed'] }}</td>
@@ -82,7 +82,61 @@
 {% block js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.2.2/tinysort.min.js"></script>
 <script>
+var taskId = "{{ task.task_id }}"
 var className = "{{ class_name }}";
+
+	// Polling to see if a student progress has been updated in db.
+	(function pollStudentProgress(){
+	  if (className !== "None") {
+		setTimeout(function(){
+		  // AJAX request 
+		  $.get("http://localhost:5000/progress/"+taskId+".json", function(data){
+		  	
+		  	if (data !== "None") {
+
+		  		for (s in data) {
+
+		  			$("#"+s).empty();
+		  			a = data[s];
+
+		  			console.log(a);
+
+		  			$("#"+s).append("<td class='name'>"+a.first+" "+a.last+"</td>");
+					
+					if (a.completed !== null) {
+						$("#"+s).append("<td class='completed'>Done</td>\
+			  				<td class='timestamp'>Completed: "+a.completed+"</td>");
+					} else if (a.overdue !== null) {
+						$("#"+s).append("<td class='overdue'>Overdue</td>");
+						if (a.viewed !== null) {
+							$("#"+s).append("<td class='timestamp'>Last Viewed: "+a.viewed+"</td>");
+						} else {
+							$("#"+s).append("<td class='timestamp'>Not yet viewed</td>");
+						}
+					} else if (a.viewed !== null) {
+						$("#"+s).append("<td class='viewed'>In progress</td>\
+			  				<td class='timestamp'>Last Viewed: "+a.viewed+"</td>");
+					} else {
+						$("#"+s).append("<td class='inactive'>Not viewed</td>\
+			  				<td class='timestamp'>Assigned on: "+a.assigned+"</td>");
+					}
+				}
+
+		  		console.log("Change");
+
+		  	} else {
+
+				console.log("No change");
+
+			}
+		  
+		    pollStudentProgress();
+
+		  });
+		}, 5000);
+	  }
+	})();
+
 
 if (className !== "None") {
 	// from TinySort's table sorting example at http://tinysort.sjeiti.com/
@@ -114,5 +168,6 @@ if (className !== "None") {
 	    }
 	});
 }
+
 </script>
 {% endblock %}
