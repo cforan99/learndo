@@ -9,6 +9,10 @@
 
     <!-- Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Signika:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -17,6 +21,20 @@
     <![endif]-->
 
     <style>
+
+    body {
+    	font-family: "Lato", "Verdana", sans-serif;
+    	margin-top: 58px;
+    }
+
+    .navbar-brand {
+    	padding: 10px 15px;
+    }
+
+    .navbar-inverse {
+    	min-height: 60px;
+	}
+
     .content {
         display:none;
         padding: 10px;
@@ -25,7 +43,126 @@
     #flash {
     	display:none;
     }
+    a {
+    	color: #563d99;
+    }
 
+    a:hover {
+    	color: #333;
+    	text-decoration: none;
+
+    }
+
+    .completed{
+    	background-color: #abe765 ;
+    }
+    .overdue{
+    	background-color: #ffcb57;
+    }
+    .overdue .info{
+    	border-color: #ffa945;
+    }
+    .viewed{
+    	background-color: #fffc92;
+    }
+    .viewed .info{
+    	border-color: #ffeb6d;
+    }
+    .inactive{
+    	background-color: #82ecf7;
+    }
+    .inactive .info{
+    	border-color: #79d3dc;
+    }
+    .info{
+    	background-color: #fff;
+    	border-radius: 100px;
+    	border-left: 20px solid;
+    	border-right: 20px solid;
+    	padding: 0px 70px 0px 70px;
+    }
+
+    .heading{
+    	text-align: center;
+    }
+
+    #buttons{
+    	margin: 0 auto;
+    }
+
+/*    .header {
+    display: table;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: url(http://localhost:5000/static/pencils.jpg) no-repeat center center scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;}
+
+    .text-vertical-center {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle; }
+*/
+    .panel {
+    	width: 300px;
+    	margin: auto auto;
+    }
+}
+
+.text-vertical-center h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 4.5em;
+    font-weight: 700;
+}
+}
+
+/*
+ * Cover
+ */
+
+.cover {
+  padding: 0 20px;
+}
+.cover .btn-lg {
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+/* Extra markup and styles for table-esque vertical and horizontal centering */
+.site-wrapper {
+  display: table;
+  width: 100%;
+  height: 100%; /* For at least Firefox */
+  min-height: 100%;
+  text-align: center;
+}
+.site-wrapper-inner {
+  display: table-cell;
+  vertical-align: top;
+}
+.cover-container {
+  margin-right: auto;
+  margin-left: auto;
+  background: url(http://localhost:5000/static/pencils.jpg) no-repeat top center scroll;
+  background-size: cover;
+}
+
+/* Padding for spacing */
+.inner {
+  padding: 30px;
+}
+
+/*    .top{
+    	-webkit-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+    	-moz-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+    	box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+    	background-color: #fff;
+    }
+*/
     </style>
 
 </head>
@@ -33,11 +170,9 @@
 
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
+      <div class="container-fluid">
       	<div class="row">
-	      <div class="col-lg-3 col-md-2 col-xs-1"></div>
-	      <div class="col-lg-6 col-md-8 col-xs-10">
-
+	      <div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 col-xs-offset-0'>
 	        <div class="navbar-header">
 	          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 	            <span class="sr-only">Toggle navigation</span>
@@ -45,17 +180,17 @@
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	          </button>
-	          <a class="navbar-brand" href="#">Learndo</a>
+	          <a class="navbar-brand" href="/"><img src='/static/logo-small.png' height='40px'></a>
 	        </div>
 	        <div id="navbar" class="collapse navbar-collapse pull-right">
 	          <ul class="nav navbar-nav">
 				{% if ("user_id" in session) and ("acct_type" in session) %}
 					{% if session["acct_type"] == 'teacher' %}
-							<li><a href='/new_assignment'>New</a></li>
-							<li><a href='/teacher/{{ session['user_id'] }}/assignments'>Assignments</a></li>
-							<li><a href='/teacher/{{ session['user_id'] }}/classes'>Classes</a></li>
-							<li><a href='/profile/{{ session['user_id'] }}'>Account</a></li>
-							<li><a href="/logout">Logout</a></li>
+							<li><a href='/new_assignment' title='New'><span class="fa fa-plus fa-2x" aria-hidden="true"></span></a></li>
+							<li><a href='/teacher/{{ session['user_id'] }}/assignments' title="Assignments"><span class="fa fa-list-alt fa-2x" aria-hidden="true"></span></a></li>
+							<li><a href='/teacher/{{ session['user_id'] }}/classes' title='Classes'><span class="fa fa-users fa-2x" aria-hidden="true"></span></a></li>
+							<li><a href='/profile/{{ session['user_id'] }}' title="Account"><span class="fa fa-cog fa-2x" aria-hidden="true"></span></a></li>
+							<li><a href="/logout" title="Log Out"><span class="fa fa-sign-out fa-2x" aria-hidden="true"></span></a></li>
 						</ul>
 					{% else %}	
 							<li><a href='/student/{{ session['user_id'] }}/assignments'>Assignments</a></li>
@@ -69,37 +204,25 @@
 					</ul>
 				{% endif %}
 	        </div><!--/.nav-collapse -->
-	      </div><!-- close center column -->
-        <div class="col-lg-3 col-md-2 col-xs-1"></div>
+	      </div><!-- close center column -->        
 	   </div><!-- close row -->
-
       </div><!-- close container -->
     </nav><!-- close nav -->
-
-    <div class="container" style="margin-top: 50px;">
-
-
-      <div class="row">
-      	<div class="col-lg-3 col-md-2 col-xs-1"></div>
-      	<div class="col-lg-6 col-md-8 col-xs-10">
+    <div class="container-fluid" style="margin-top: 50px;">
+      <div class="row top">
+      	<div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 col-xs-offset-0'>
 
 		<div id="flash" class="alert alert-info" role="alert">
 		  {% for flash in get_flashed_messages() %}
 		  {{ flash }}
 		  {% endfor %}
 		</div>
-		
 
-        {% block content %}
-            Put your body here.
+		{% block content %}
+            Put your top content here.
         {% endblock %}
-
-        </div><!-- close center column -->
-        <div class="col-lg-3 col-md-2 col-xs-1"></div>
-
-      </div><!-- close row -->
-      <br><br>
-
+		</div><!-- close center column -->
+	  </div><!-- close row -->
     </div><!-- close container -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

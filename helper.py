@@ -114,7 +114,8 @@ def find_class_by_task(task_id):
         if class_dictionary[c]['users'] == assigned_users:
             assigned_class = class_dictionary[c]['name']
 
-        return assigned_class
+    return assigned_class
+
 
 def report_student_progress(task, assignment_list):
     """Generates a dictionary of students associated with the task's assignment and

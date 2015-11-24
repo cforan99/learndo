@@ -1,32 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>{{ task.title }} &nbsp; <button onclick="location.href='/teacher/{{ task.created_by }}/assignments/{{ task.task_id }}/edit'">edit</button></h2> 
-
-<div class="assignment">
-	<h3>Learning goal:</h3>
-	<p>{{ task.goal }}</p>
-
-	<h3>Directions</h3>
-	<p>{{ task.directions }}</p>
-
-	<h3>Link to resource:</h3>
-	<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
-
-	<h3>Due date: {{ due_date }}</h3>
-	<h3>Total points: {{ task.points }}</h3>
-</div>
+<h2>{{ task.title }} &nbsp; <span class="pull-right"><button onclick="location.href='/teacher/{{ task.created_by }}/assignments/{{ task.task_id }}/edit'" class="btn">edit</button></span></h2> 
 
 <div class="student-progress">
-	<h2>Student Progress</h2>
+	<h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
+	<h3>Student Progress</h3>
 	<div class="assign">
 	  {% if class_name != None %}
-	  	<h3>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h3>
-	  	<table class="list-progress props xmpl" id="xtable">
+	  	<table class="table table-condensed list-progress props xmpl" id="xtable">
 	  		<thead>
 	  			<tr><th>Student Name</th>
 	  			<th>Status</th>
-	  			<th>Timestamp</th>
+	  			<th>Recent Activity</th>
 	  			</tr>
 	  		</thead>
 	  		<tbody>
@@ -73,8 +59,21 @@
 				</form>
 		    </div>
 	  {% endif %}
-	<br><br>
 	</div>
+	</div>
+
+	<div class="assignment">
+	<h3>Learning goal:</h3>
+	<p>{{ task.goal }}</p>
+
+	<h3>Directions</h3>
+	<p>{{ task.directions }}</p>
+
+	<h3>Link to resource:</h3>
+	<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
+
+	<h3>Due date: {{ due_date }}</h3>
+	<br><br>
 	</div>
 
 {% endblock %}
