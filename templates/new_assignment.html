@@ -1,41 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>New Assignment</h2>
+<h2 class="text-center">New Assignment</h2>
 
-<form action="/create_assignment" method="POST">
-    <div>
+<form action="/create_assignment" method="POST" class="center-col">
+    <div class="form-group">
         <label>
             Title: 
-            <input type="text" name="title" size="42" placeholder="short description" required>
-        </label><br><br>
+            <input type="text" name="title" size="46" placeholder="short description" class="form-control" required>
+        </label>
     </div>
-
-    <div>
+    <div class="form-group">
         <label>
             Learning goal: <br>
-            <textarea name="goal" rows="3" cols="45" placeholder="What will students learn from this assignment?" maxlength="712" required></textarea>
-        </label><br><br>
+            <textarea name="goal" rows="3" cols="45" placeholder="What will students learn from this assignment?" maxlength="712" class="form-control" required></textarea>
+        </label>
     </div>
-
-    <div>
+    <div class="form-group">
         <label>
             Directions: <br>
-            <textarea name="directions" rows="5" cols="45" maxlength="712" required></textarea>
-        </label><br><br>
+            <textarea name="directions" rows="5" cols="45" maxlength="712" class="form-control" required></textarea>
+        </label>
     </div>
-
-    <div>
+    <div class="form-group">
         <label>
             Link to on-line resource:<br>
-            <input type="url" name="link" maxlength="256" size="48" placeholder="http://www.edudeveloper.net">
-        </label><br><br>
+            <input type="url" name="link" maxlength="256" size="46" placeholder="http://www.edudeveloper.net" class="form-control">
+        </label>
     </div>
-
-    <div>
+    <div class="form-group form-inline">
         <label>
             Due date: 
-              <select id="month" name="month" required> 
+              <select id="month" name="month" class="form-control" required> 
                 <option value="01">Jan.</option>       
                 <option value="02">Feb.</option>       
                 <option value="03">March</option>       
@@ -49,7 +45,7 @@
                 <option value="11">Nov.</option>       
                 <option value="12">Dec.</option>       
               </select> 
-              <select id="day" name="day" required> 
+              <select id="day" name="day" class="form-control"  required> 
                 <option value="01">1</option>       
                 <option value="02">2</option>       
                 <option value="03">3</option>       
@@ -82,8 +78,7 @@
                 <option value="30">30</option>       
                 <option value="31">31</option>       
               </select> 
-              <select id="year" 
-                     name="year">       
+              <select id="year" name="year" class="form-control">
                 <option value="15">2015</option>       
                 <option value="16">2016</option>       
                 <option value="17">2017</option>
@@ -92,7 +87,7 @@
             </label><br>
             <label>
               Time due: 
-              <select id="hour" name="hour" required> 
+              <select id="hour" name="hour" class="form-control" required> 
                 <option value="01">1</option>       
                 <option value="02">2</option>       
                 <option value="03">3</option>       
@@ -106,7 +101,7 @@
                 <option value="11">11</option>       
                 <option value="12">12</option>       
               </select> 
-              <select id="minute" name="minute" required> 
+              <select id="minute" name="minute" class="form-control" required> 
                 <option value="00">00</option>       
                 <option value="05">05</option>       
                 <option value="10">10</option>       
@@ -120,26 +115,32 @@
                 <option value="50">50</option>       
                 <option value="55">55</option>       
               </select> 
-              <select id="ampm" name="ampm" required> 
+              <select id="ampm" name="ampm" class="form-control" required> 
                 <option value="AM">am</option>       
                 <option value="PM">pm</option>           
               </select> 
-        </label><br><br>
+        </label>
     </div>
-
-    <div>
-        <label>
-            Total points:
-            <input type="number" name="points">
-        </label><br><br>
-    </div>
-
     <div>
         <input type="hidden" name="teacher_id" value="{{ user.user_id }}">
-        <input type="submit" value="Save Assignment">
+        <input type="submit" value="Save Assignment" class="btn btn-info">
     </div>
 </form>
-
-
-
+{% endblock %}
+{% block js%}
+<script>
+    var now = new Date();
+    var month = now.getMonth()+1;
+    var day = now.getDate();
+    var year = now.getFullYear()-2000;
+    if(month < 10) {
+        month = '0'+month;
+    }
+    if(day < 10) {
+        day = '0'+day;
+    }
+    $('#month option[value="' + month + '"]').prop('selected', true)
+    $('#day option[value="' + day + '"]').prop('selected', true)
+    $('#year option[value="' + year + '"]').prop('selected', true)
+</script>
 {% endblock %}

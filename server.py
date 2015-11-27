@@ -528,11 +528,7 @@ def create_assignment():
     hour = request.form.get("hour")
     minute = request.form.get("minute")
     ampm = request.form.get("ampm")
-    points = int(request.form.get("points"))
     teacher_id = request.form.get("teacher_id")
-
-    if points == "":
-        points = None
 
     date_string = "{}/{}/{} {}:{} {}".format(month, day, year, hour, minute, ampm)
     due_date = datetime.strptime(date_string, "%m/%d/%y %I:%M %p")
@@ -546,7 +542,6 @@ def create_assignment():
                         goal=goal,
                         directions=directions,
                         link=link,
-                        points=points,
                         due_date=due_date)
 
         db.session.add(new_task)
@@ -587,6 +582,8 @@ def view_assignment(teacher_id, task_id):
         class_name = None
         progress = None
 
+    status = check_class_status(assignment_list[0])
+
     # double-checks authorization before rendering template
     user_id = session['user_id']
 
@@ -596,7 +593,8 @@ def view_assignment(teacher_id, task_id):
                                                        class_list=class_list, 
                                                        class_name=class_name,
                                                        assigned_on=assigned_on,
-                                                       progress=progress)
+                                                       progress=progress,
+                                                       status=status)
     else:
         flash("You do not have access to that page.")
         return redirect("/")

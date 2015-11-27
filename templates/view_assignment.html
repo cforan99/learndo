@@ -2,10 +2,10 @@
 {% block content %}
 
 <h2>{{ task.title }} &nbsp; <span class="pull-right"><button onclick="location.href='/teacher/{{ task.created_by }}/assignments/{{ task.task_id }}/edit'" class="btn">edit</button></span></h2> 
+<h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
 
 <div class="student-progress">
-	<h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
-	<h3>Student Progress</h3>
+	<h3 class="text-centered">Student Progress</h3>
 	<div class="assign">
 	  {% if class_name != None %}
 	  	<table class="table table-condensed list-progress props xmpl" id="xtable">
@@ -60,9 +60,9 @@
 		    </div>
 	  {% endif %}
 	</div>
-	</div>
+</div>
 
-	<div class="assignment">
+<div class="assignment">
 	<h3>Learning goal:</h3>
 	<p>{{ task.goal }}</p>
 
@@ -74,14 +74,15 @@
 
 	<h3>Due date: {{ due_date }}</h3>
 	<br><br>
-	</div>
+</div>
 
 {% endblock %}
 
 {% block js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.2.2/tinysort.min.js"></script>
 <script>
-var taskId = "{{ task.task_id }}"
+
+var taskId = "{{ task.task_id }}";
 var className = "{{ class_name }}";
 
 	// Polling to see if a student progress has been updated in db.

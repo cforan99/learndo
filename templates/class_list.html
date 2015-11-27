@@ -1,131 +1,162 @@
 {% extends 'base.html' %}
 {% block content %}
-<div id="select-form">
-    <button id="new-class" class="form-buttons btn btn-primary">New Class</button>
-    <button id="add-student" class="form-buttons btn btn-primary">Add Student</button>
-    <button id="new-student" class="form-buttons btn btn-primary">New Student</button>
-</div>
 
-<div id="classes-forms">
-    <div class="new-class content">
-    <h3>Add a new class</h3>
-    <form action="/new_class" method="POST" id="new-class-form">
-        <div>
-            <label>Class name:
-                <input type="text" name="class_name" required>
-            </label>
-            <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-            <input id="new-class-button" type="submit" id="create-class" value="Create">
+    <div id="select-form" class="text-center">
+        <button id="new-class" class="form-buttons btn btn-primary">New Class</button>
+        <button id="add-student" class="form-buttons btn btn-primary">Add Student</button>
+        <button id="new-student" class="form-buttons btn btn-primary">New Student</button>
+        <br>
+        <h3 id="your-classes" class="text-center">Your classes</h3>
+    </div>
+
+    <div id="classes-forms">
+        <div class="new-class content">
+            <h3>Add a new class</h3>
+            <form action="/new_class" method="POST" id="new-class-form" class="form-inline">
+            <div class="form-group">
+                <label>Class name: &nbsp; 
+                <input type="text" name="class_name" class="form-control" required>
+                </label>
+                <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+                <input id="new-class-button" type="submit" id="create-class" class="btn btn-info" value="Create">
+            </div>
+            </form>
         </div>
-    </form>
-    </div>
 
-    <div class="add-student content">
-    <h3>Add student by username</h3>
-    <form action="/add_student" method="POST" id="add-student-form">
-        <div>
-            <label>Username:
-                <input type="text" name="username" required>
-            </label><br>
-            <select name="class-id">
-              {% for class_id in class_list.keys() %}
-              <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
-              {% endfor %}
-            </select>
+        <div class="add-student content">
+            <h3>Add student by username</h3>
+            <form action="/add_student" method="POST" id="add-student-form" class="form-inline">
+            <div class="form-group">
+                <label>Username:
+                <input type="text" name="username" class="form-control" required>
+                </label><br>
+            </div>
+            <div class="form-group">
+                <select name="class-id" class="form-control">
+                {% for class_id in class_list.keys() %}
+                     <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
+                {% endfor %}
+                </select>
+            </div>
             <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-            <input id="add-student-button" type="submit" value="Add to class">
+            <input id="add-student-button" type="submit" class="btn btn-info" value="Add to class">
+            </form>
         </div>
-    </form>
+
+        <div class="new-student content">
+            <h3>Create new student account</h3>
+
+            <form action="/new_student" method="POST" id="new-student-form" class="form-inline">
+            <div class="form-group">
+            <label>
+                First name: &nbsp; 
+                <input type="text" name="first" class="form-control" required>
+            </label><br><br>
+            </div>
+
+            <div class="form-group">
+            <label>
+                Last name:  &nbsp; 
+                <input type="text" name="last" class="form-control" required>
+            </label><br><br>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Preferred name:   &nbsp; 
+                    <input type="text" name="preferred" class="form-control">
+                </label><br><br>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Email: &nbsp; 
+                    <input type="email" name="email" class="form-control">
+                </label><br><br>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Username:  &nbsp; 
+                    <input type="text" name="username" class="form-control" required>
+                </label><br><br>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Password: &nbsp; 
+                    <input type="password" name="password" class="form-control" required>
+                </label><br><br>
+            </div>
+
+            <div>
+                Class:  &nbsp; 
+                <select name="class-id" class="form-control">
+                  {% for class_id in class_list.keys() %}
+                  <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
+                  {% endfor %}
+                </select><br><br>
+            </div>
+
+            <div>
+                <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
+                <input id="new-student-button" type="submit" value="Create Account" class="btn btn-info">
+            </div>
+            </form>
+        </div>
     </div>
 
-    <div class="new-student content">
-    <h3>Create new student account</h3>
+</div></div></div>
+<div class="assignments container-fluid">
+    <div class="row completed">
+        <div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-12 col-xs-offset-0 info'>  
+            <div id="class-list" class="center-col">
+                <br>
+                <ul>
+                {% for class_id in class_list.keys() %}
 
-    <form action="/new_student" method="POST" id="new-student-form">
-    <div>
-        <label>
-            First name: 
-            <input type="text" name="first" required>
-        </label><br><br>
-    </div>
-
-    <div>
-        <label>
-            Last name: 
-            <input type="text" name="last" required>
-        </label><br><br>
-    </div>
-
-    <div>
-        <label>
-            Preferred name: 
-            <input type="text" name="preferred">
-        </label><br><br>
-    </div>
-
-    <div>
-        <label>
-            Email:
-            <input type="email" name="email">
-        </label><br><br>
-    </div>
-
-    <div>
-        <label>
-            Username: 
-            <input type="text" name="username" required>
-        </label><br><br>
-    </div>
-
-    <div>
-        <label>
-            Password:
-            <input type="password" name="password" required>
-        </label><br><br>
-    </div>
-
-    <div>
-        Class:
-        <select name="class-id">
-          {% for class_id in class_list.keys() %}
-          <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
-          {% endfor %}
-        </select><br><br>
-    </div>
-
-    <div>
-        <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
-        <input id="new-student-button" type="submit" value="Create Account">
-    </div>
-</form>
-</div>
-</div>
-    
-    <div id="class-list">
-        <h3 id="your-classes">Your classes</h3>
-        <ul>
-        {% for class_id in class_list.keys() %}
-
-            <li id="c{{ class_id }}"><b>{{ class_list[class_id]['class_name'] }}</b> 
-            <button class="delete_class" data-classid="{{ class_id }}">x</button>
-            </li>
-
-                {% if 'students' in class_list[class_id] %}
-                  <ul id="class{{ class_id }}">
-                    {% for student in class_list[class_id]['students'] %}
-                    <li id="s{{ student.user_id }}">
-                    {{ student.first_name }} {{ student.last_name }} 
-                    (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) 
-                    <button class="remove_student" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}">x</button>
-                    
-
+                    <li id="c{{ class_id }}"><b>{{ class_list[class_id]['class_name'] }}</b>  &nbsp; 
+                    <button data-classid="{{ class_id }}" class="btn btn-default btn-xs delete_class" data-toggle="modal" data-target="#confirmDelete"><span class="fa fa-close" aria-hidden="true"></span></button>
                     </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-        {% endfor %}
-        </ul>
+
+                    {% if 'students' in class_list[class_id] %}
+                        <ul id="class{{ class_id }}">
+                            {% for student in class_list[class_id]['students'] %}
+                                <li id="s{{ student.user_id }}">
+                                {{ student.first_name }} {{ student.last_name }} 
+                                (<a href="/profile/{{student.user_id}}">{{student.username}}</a>) &nbsp; 
+                                <button class="btn btn-default btn-xs remove_student" data-toggle="modal" data-target="#confirmDelete" data-classid="{{ class_id }}" data-studentid="{{ student.user_id }}"><span class="fa fa-close" aria-hidden="true"></span></button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+                <br>
+            </div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Please confirm</h4>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" id="remove">Remove</button>
+      </div>
     </div>
+  </div>
+
 
 
 {% endblock %} 
@@ -150,19 +181,31 @@
         }, 5000);
     }
 
-
     function deleteClass(evt) {
       evt.preventDefault();
       var classid = $(this).attr('data-classid');
       var formValues = {
         'class_id' : $(this).attr('data-classid')
       };
-      if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
+      $(".modal-body").text('Are you sure you want to delete this class? The students in this class will no longer have access to it.')
+      $("#remove").on("click", function() {
         $.post("/delete_class", formValues, showConfirmation);
         $("li#c"+classid).remove();
-
-      }
+        });
     }
+
+    // function deleteClass(evt) {
+    //   evt.preventDefault();
+    //   var classid = $(this).attr('data-classid');
+    //   var formValues = {
+    //     'class_id' : $(this).attr('data-classid')
+    //   };
+    //   if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
+    //     $.post("/delete_class", formValues, showConfirmation);
+    //     $("li#c"+classid).remove();
+
+    //   }
+    // }
 
     $("button.delete_class").on("click", deleteClass);
 
@@ -176,11 +219,12 @@
         'user_id' : $(this).attr('data-studentid')
       };
 
-      if (confirm('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')) {
+      $(".modal-body").text('Are you sure you want to remove this student from your class? This will not delete the student\'s account.')
+      $("#remove").on("click", function() {
         $.post("/remove_student", formValues, showConfirmation);
-        console.log(studentid)
+        console.log(studentid);
         $("ul#class"+classid+" li#s"+studentid).remove();
-      }
+      });
     }
 
     $("button.remove_student").on("click", removeStudent);
