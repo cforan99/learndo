@@ -5,8 +5,8 @@
 <h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
 
 <div class="student-progress">
-	<h3 class="text-centered">Student Progress</h3>
-	<div class="assign">
+<h3>Student Progress</h3>
+  <div class="assign">
 	  {% if class_name != None %}
 	  	<table class="table table-condensed list-progress props xmpl" id="xtable">
 	  		<thead>
@@ -61,8 +61,9 @@
 	  {% endif %}
 	</div>
 </div>
+<br>
 
-<div class="assignment">
+<div class="assignment details">
 	<h3>Learning goal:</h3>
 	<p>{{ task.goal }}</p>
 
@@ -73,8 +74,8 @@
 	<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
 
 	<h3>Due date: {{ due_date }}</h3>
-	<br><br>
 </div>
+<br><br>
 
 {% endblock %}
 

@@ -5,13 +5,12 @@
         <button id="new-class" class="form-buttons btn btn-primary">New Class</button>
         <button id="add-student" class="form-buttons btn btn-primary">Add Student</button>
         <button id="new-student" class="form-buttons btn btn-primary">New Student</button>
-        <br>
-        <h3 id="your-classes" class="text-center">Your classes</h3>
+        <br><br>
     </div>
 
     <div id="classes-forms">
-        <div class="new-class content">
-            <h3>Add a new class</h3>
+        <div class="new-class content center-col panel panel-default">
+            <h3 class="text-center">Add a new class</h3>
             <form action="/new_class" method="POST" id="new-class-form" class="form-inline">
             <div class="form-group">
                 <label>Class name: &nbsp; 
@@ -23,79 +22,82 @@
             </form>
         </div>
 
-        <div class="add-student content">
+        <div class="add-student content center-col panel panel-default text-center">
             <h3>Add student by username</h3>
-            <form action="/add_student" method="POST" id="add-student-form" class="form-inline">
+            <form action="/add_student" method="POST" id="add-student-form">
             <div class="form-group">
                 <label>Username:
                 <input type="text" name="username" class="form-control" required>
                 </label><br>
             </div>
             <div class="form-group">
+                <label>
                 <select name="class-id" class="form-control">
                 {% for class_id in class_list.keys() %}
                      <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
                 {% endfor %}
                 </select>
+                </label>
             </div>
             <input type="hidden" name="teacher" value="{{ session['user_id'] }}">
             <input id="add-student-button" type="submit" class="btn btn-info" value="Add to class">
             </form>
         </div>
 
-        <div class="new-student content">
-            <h3>Create new student account</h3>
+        <div class="new-student content center-col panel panel-default text-center">
+            <h3 class="text-center">Create new student account</h3>
 
-            <form action="/new_student" method="POST" id="new-student-form" class="form-inline">
+            <form action="/new_student" method="POST" id="new-student-form">
             <div class="form-group">
             <label>
                 First name: &nbsp; 
-                <input type="text" name="first" class="form-control" required>
-            </label><br><br>
+                <input type="text" name="first" class="form-control" size="30"  required>
+            </label>
             </div>
 
             <div class="form-group">
             <label>
                 Last name:  &nbsp; 
-                <input type="text" name="last" class="form-control" required>
-            </label><br><br>
+                <input type="text" name="last" class="form-control" size="30" required>
+            </label>
             </div>
 
             <div class="form-group">
                 <label>
                     Preferred name:   &nbsp; 
-                    <input type="text" name="preferred" class="form-control">
-                </label><br><br>
+                    <input type="text" name="preferred" class="form-control" size="30">
+                </label>
             </div>
 
             <div class="form-group">
                 <label>
                     Email: &nbsp; 
-                    <input type="email" name="email" class="form-control">
-                </label><br><br>
+                    <input type="email" name="email" class="form-control" size="30">
+                </label>
             </div>
 
             <div class="form-group">
                 <label>
                     Username:  &nbsp; 
-                    <input type="text" name="username" class="form-control" required>
-                </label><br><br>
+                    <input type="text" name="username" class="form-control" size="30" required>
+                </label>
             </div>
 
             <div class="form-group">
                 <label>
                     Password: &nbsp; 
-                    <input type="password" name="password" class="form-control" required>
-                </label><br><br>
+                    <input type="password" name="password" class="form-control" size="30" required>
+                </label>
             </div>
 
-            <div>
-                Class:  &nbsp; 
-                <select name="class-id" class="form-control">
+            <div class="form-group">
+                <labeL>Class:  &nbsp;
+                <select name="class-id" class="form-control col-xs-3 col-md-3">
                   {% for class_id in class_list.keys() %}
                   <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
                   {% endfor %}
-                </select><br><br>
+                </select>
+                </labeL>
             </div>
 
             <div>
@@ -105,11 +107,9 @@
             </form>
         </div>
     </div>
+    <h3 id="your-classes" class="text-center">Your classes</h3>
 
-</div></div></div>
-<div class="assignments container-fluid">
-    <div class="row completed">
-        <div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-12 col-xs-offset-0 info'>  
+<div class="details">
             <div id="class-list" class="center-col">
                 <br>
                 <ul>
@@ -136,9 +136,7 @@
             </div>
 
 </div>
-</div>
-</div>
-</div>
+<br><br>
 
 <div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog modal-sm" role="document">

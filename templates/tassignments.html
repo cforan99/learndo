@@ -36,6 +36,15 @@
 
     });
 
+    // Get and store current data
+	var currentData;
+
+	function setCurrentData(data) {
+		currentData = data.list;
+		filterData(currentData, 'show-all', 'newest');
+	}
+
+
     function filterData(data) {
     	
     	var filter = $("#filtering .active").attr('id');
@@ -111,15 +120,6 @@
 		$("body").append("</div>");
 	}
 
-	// Get and store current data
-
-
-	var currentData;
-
-	function setCurrentData(data) {
-		currentData = data.list;
-		filterData(currentData, 'show-all', 'newest');
-	}
 
 </script>
 {% endblock %}
