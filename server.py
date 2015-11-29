@@ -12,11 +12,8 @@ from helper import *
 
 app = Flask(__name__)
 
-# Required to use Flask sessions and the debug toolbar
-app.secret_key = "This_should_be_secret"
+app.config['SECRET_KEY'] = os.environ.get("FLASK_SECRET_KEY", "abcdef")
 
-# Normally, if you use an undefined variable in Jinja2, it fails silently.
-# This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
 
@@ -31,13 +28,6 @@ def index():
        return render_template("homepage.html")
 
 ############### REGISTRATION ###############
-
-@app.route('/register', methods=['GET'])
-def register_form():
-    """Shows registration form"""
-
-    return render_template("register_form.html")
-
 
 @app.route('/register', methods=['POST'])
 def register_process():
@@ -84,13 +74,6 @@ def register_process():
 
 
 ############### LOGIN / LOGOUT ###############
-
-@app.route('/login', methods=['GET'])
-def login_form():
-    """Show login form."""
-
-    return render_template("login_form.html")
-
 
 @app.route('/login', methods=['POST'])
 def login_process():
@@ -724,4 +707,8 @@ if __name__ == "__main__":
 
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-    app.run()
+    DEBUG = "NO_DEBUG" not in os.environ
+    PORT = int(os.environ.get("PORT", 5000))
+
+    app.run(host="0.0.0.0", port=PORT, debug=DEBUG)
+
