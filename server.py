@@ -24,7 +24,11 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage with registration form and login link"""
 
-    return render_template("homepage.html")
+    if session.get('user_id'):
+        url = "/"+session['acct_type']+"/"+str(session['user_id'])+"/assignments"
+        return redirect(url)
+    else:
+       return render_template("homepage.html")
 
 ############### REGISTRATION ###############
 
@@ -74,7 +78,7 @@ def register_process():
     session["user_id"] = new_teacher.user_id
     session["acct_type"] = 'teacher'
 
-    flash("Your teacher account has been created with the username {} and password {}".format(username, password))
+    flash("Your teacher account has been created! Get started by setting up your classes.".format(username, password))
     
     return redirect("/teacher/{}/classes".format(new_teacher.user_id))
 
@@ -132,27 +136,12 @@ def logout():
     return redirect("/")
 
 
-############### TEACHER VIEWS ###############
-
-# # No more need for dashboard, so should this just become the user's profile page?
-# @app.route('/teacher/<int:user_id>')
-# def show_teacher_dashboard(user_id):
-#     """Initially shows links to messages, tasks, classes, and create a new task"""
-
-#     if session['user_id'] == user_id:
-#         teacher = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-#         return render_template("tdashboard.html", teacher=teacher)
-#     else:
-#         flash("You do not have access to that page.")
-#         return redirect("/")
-
-
 ############### MANAGING CLASSES ###############
 @app.route('/teacher/<int:user_id>/classes')
 def manage_classes(user_id):
     """Shows class lists and student lists. Teacher can also add classes and students."""
 
-    if session['user_id'] == user_id:
+    if session.get('user_id') == user_id:
         teacher = User.query.get(user_id) ## Can I make this a global variable or store in session?
         class_list = show_classes(teacher)
         return render_template("class_list.html", teacher=teacher, class_list=class_list)
@@ -170,7 +159,7 @@ def create_class():
     class_name = request.form.get("class_name")
 
     # Create a new class in db and add the teacher to the class.
-    if session['acct_type'] == 'teacher':
+    if session.get('acct_type', 0) == 'teacher':
         teacher = User.query.get(user_id)
         add_class(teacher, class_name)
 
@@ -203,7 +192,7 @@ def add_student():
         return redirect('/teacher/{}/classes'.format(teacher_id))
 
     if exists:
-        if session['acct_type'] == 'teacher':
+        if session.get('acct_type', 0) == 'teacher':
             user.classes.append(new_class)
             db.session.commit()
             flash("{} has been added to {}".format(user.first_name, new_class.class_name))
@@ -251,7 +240,7 @@ def remove_student():
 
     this_student = User.query.get(student_id)
 
-    if session['acct_type'] == 'teacher':
+    if session.get('acct_type', 0) == 'teacher':
         db.session.delete(user_class)
         db.session.commit()
         return "{} has been removed from that class.".format(this_student.display_name)
@@ -285,7 +274,7 @@ def create_student():
     if preferred == "":
         preferred = first
 
-    if session['acct_type'] == 'teacher':
+    if session.get('acct_type', 0) == 'teacher':
         teacher = User.query.get(teacher_id)
 
         # Creates new user in db
@@ -375,24 +364,11 @@ def edit_profile():
 
 
 ############### ASSIGNMENTS ###############
-# FIX ME: Re-route to profile page
-# @app.route('/student/<int:user_id>')
-# def show_student_dashboard(user_id):
-#     """Initially shows links to messages and tasks"""
-
-#     if session['user_id'] == user_id:
-#         student = User.query.get(user_id)  ## Can I make this a global variable or store in session?
-#         return render_template("sdashboard.html", student=student)
-#     else:
-#         flash("You do not have access to that page.")
-#         return redirect("/")
-
-
 @app.route('/teacher/<int:user_id>/assignments')
 def show_teacher_assignments(user_id):
     """Lists assignments created by a teacher"""
 
-    if session['user_id'] == user_id:
+    if session.get('user_id') == user_id:
         return render_template("tassignments.html", tid=session['user_id'])
     else:
         flash("You do not have access to that page.")
@@ -403,7 +379,7 @@ def show_teacher_assignments(user_id):
 def test_student_assignments(user_id):
     """Lists assignments assigned to a student"""
 
-    if session['user_id'] == user_id:
+    if session.get('user_id') == user_id:
         return render_template("sassignments-js.html", sid=session['user_id'])
 
     else:
@@ -415,42 +391,16 @@ def test_student_assignments(user_id):
 def sort_by_assigned():
     """Returns a list of assignments for the user_id in session as a JSONifiable array of objects."""
 
-    if session['acct_type'] == 'student':
+    if session.get('acct_type') == 'student':
         user = User.query.get(session['user_id'])
         assignments_list = user.assignments
         assignments = create_assignment_list(assignments_list)
         return jsonify(assignments)
-    if session['acct_type'] == 'teacher':
+    if session.get('acct_type') == 'teacher':
         user = User.query.get(session['user_id'])
         assignments_list = Task.query.filter(Task.created_by == session['user_id']).all()
         assignments = create_assignment_list(assignments_list)
         return jsonify(assignments)
-
-
-# @app.route('/checklist')
-# def check_for_new_assignments():
-#     """Takes a list of assignment ids from the client and compares it to the ones in the db for that 
-#     student. If there are different a new JSON object is returned, if not the 'No change' is sent."""
-
-#     current_data_ids = json.loads(data)
-#     print current_data_ids
-
-#     newest_data_ids = []
-#     assignments_list = Assignment.query.filter(Assignment.student_id == session['user_id']).all()
-
-#     for a in assignments_list:
-#         newest_data_ids.append(a.assign_id)
-
-#     newest_data_ids.sort()
-
-#     print newest_data_ids
-
-#     if current_data_ids == newest_data_ids:
-#         return 'No change'
-
-#     else:
-#         assignments = create_assignment_list(assignments_list)
-#         return jsonify(assignments)
 
 
 @app.route('/student/<int:student_id>/assignments/<int:assign_id>')
@@ -641,7 +591,7 @@ def edit_assignment_form(teacher_id, task_id):
     minute = task.due_date.strftime("%M")
     ampm = task.due_date.strftime("%p")
 
-    if session['user_id'] == teacher_id:
+    if session.get('user_id') == teacher_id:
         return render_template("edit_assignment.html", teacher=teacher, 
                                                        task=task,
                                                        month=month,
@@ -712,7 +662,7 @@ def assign_to_class():
     this_class = Class.query.get(class_id)
     class_list = this_class.users
 
-    if session['user_id'] == task.created_by:
+    if session.get('user_id') == task.created_by:
         for user in class_list:
             new_assignment = Assignment(student_id=user.user_id,
                                         task_id=task_id,

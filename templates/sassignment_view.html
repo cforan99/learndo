@@ -5,27 +5,31 @@
 
 <div class="assignment">
 
-	<div class="checkbox">
-		<form action="/completed" method="POST" class="form">
-			<label for="checkbox">I have finished this assignment!</label> <input type="checkbox" name="completed" class="complete">
+	<div class="checkbox alert alert-success">
+		<form action="/completed" method="POST" class="form form-inline">
+			<div class="form-group">
+			<label>
+			<input type="checkbox" name="completed" class="complete">
+			I have finished this assignment! 
 			<input type="hidden" name="assign_id" value="{{ assignment.assign_id }}">
+			</label>
+			</div>
 		</form>
 	</div>
+	
+	<h4><b>Due date: {{ due_date }}</b></h4>
+	<h4><i>Assigned on {{ assigned_on }}</i></h4><br>
+	<div class="details">
+		<h3>Learning goal:</h3>
+		<p>{{ task.goal }}</p>
 
-	<h4>Due date: {{ due_date }}</h4>
-	<h4>Assigned on {{ assigned_on }}</h4>
+		<h3>Directions</h3>
+		<p>{{ task.directions }}</p>
 
-	<h3>Learning goal:</h3>
-	<p>{{ task.goal }}</p>
-
-	<h3>Directions</h3>
-	<p>{{ task.directions }}</p>
-
-	<h3>Link to resource:</h3>
-	<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
-
-
-	<h3>Total points: {{ task.points }}</h3>
+		<h3>Link to resource:</h3>
+		<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
+		<br><br>
+	</div>
 </div>
 {% endblock %}
 

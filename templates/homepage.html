@@ -32,7 +32,7 @@
 		    </form>
 		    </div>
 		    </div>
-		    <br><br><br><br><br><br><br><br><br><br><br><br>
+		    <br><br><br><br><br><br><br><br><br><br><br>
 		    <img src="/static/logo-white-bg.png" width="240px">
 		  </div>
 		</div>
@@ -44,8 +44,10 @@
       	<div class="row">
 	      <div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 col-xs-offset-0'>
 
-	      <h4 class="text-center"><i>Learndo is an assignment tracking and notification system for teachers to use with their students.</i></h4>
+	      <h3 class="text-center"><i>Learndo is an assignment tracking and notification system for teachers to use with their students.</i></h3><br>
 
+	      <div class="panel panel-default">
+	      <div class="panel-body">
 			<h4>Features include:</h4>
 				<ul>
 					<li>Create accounts for you students and organize them into classes.</li>
@@ -53,13 +55,89 @@
 					<li>Get notifications when students have completed assignments.</li>
 					<li>View your entire class's progress on an assignment, including ones that are overdue.</li>
 				</ul>
-
-			<h4 class="text-center">Don't lose any more class time because your students are waiting for direction or have nothing to do. <br>Keep their learning momentum going strong with Learndo!</h4>
-			<a href="/register"><h2 class="text-center">Register as a Teacher</h2></a>
+		  </div></div>
+		  <div class="text-center">
+			<h4 class="text-center">Don't lose any more class time because your students are waiting for direction or have nothing to do.</h4>
+			<h4 class="text-center"><b>Keep their learning momentum going strong with Learndo!</b></h4><br>
+			<button type="button" class="btn btn-info btn-lg" id="register" data-toggle="modal" data-target="#registerForm">Register as a Teacher</button>
 			<br><br>
+		  </div>
 
 		  </div>
 		</div>
 	  </div>
+	</div>
+
+<div class="modal fade" id="registerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center" id="myModalLabel">Register for a teacher account</h4>
+      </div>
+      <div class="modal-body center-col">
+        <form action="/register" method="POST" class="form-inline">
+            <div class="form-group">
+                <label>
+                    First name: &nbsp; 
+                    <input type="text" name="first" size="25" class="form-control" required>
+                </label>
+            </div><br>
+
+            <div class="form-group">
+                <label>
+                    Last name:  &nbsp; 
+                    <input type="text" name="last" size="25" class="form-control" required>
+                </label>
+            </div><br>
+
+            <div class="form-group">
+                <label>
+                    Display name:  &nbsp; 
+                    <input type="text" name="preferred" size="22" class="form-control">
+                </label>
+            </div><br>
+
+            <div class="form-group">
+                <label>
+                    Email:  &nbsp; 
+                    <input type="email" name="email" size="30" class="form-control" required>
+                </label>
+            </div><br>
+
+            <div class="form-group">
+                <label>
+                    Username:  &nbsp; 
+                    <input type="text" name="username" class="form-control" required>
+                </label>
+            </div><br>
+
+            <div class="form-group">
+                <label>
+                    Password: &nbsp; 
+                    <input type="password" name="password" class="form-control" required>
+                </label>
+            </div><br>
+
+            <div class="form-group">
+                <label>
+                    School:  &nbsp; 
+                    <input type="text" name="school" size="28" class="form-control" required>
+                </label>
+            </div><br>
+
+            <div class="form-group form-inline">
+                <label><input type="checkbox" name="teacher" value="1" required> &nbsp; I am a teacher.</label>
+            </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <input type="submit" value="Register" class="btn btn-info">
+        </form>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}

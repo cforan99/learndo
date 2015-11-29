@@ -192,19 +192,6 @@
         });
     }
 
-    // function deleteClass(evt) {
-    //   evt.preventDefault();
-    //   var classid = $(this).attr('data-classid');
-    //   var formValues = {
-    //     'class_id' : $(this).attr('data-classid')
-    //   };
-    //   if (confirm('Are you sure you want to delete this class? The students in this class will no longer have access to it.')) {
-    //     $.post("/delete_class", formValues, showConfirmation);
-    //     $("li#c"+classid).remove();
-
-    //   }
-    // }
-
     $("button.delete_class").on("click", deleteClass);
 
     function removeStudent(evt) {

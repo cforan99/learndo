@@ -49,14 +49,17 @@
     #flash {
     	display:none;
     }
-    a {
+    a, a:hover {
     	color: #563d99;
     }
 
-    a:hover {
-    	color: #333;
-    	text-decoration: none;
+    
+    a:active {
+    	color: #8872b2;
+    }
 
+    a:visited {
+        color: #60517e;
     }
 
     .completed{
@@ -215,14 +218,14 @@
 							<li><a href="/logout" title="Log Out"><span class="fa fa-sign-out fa-2x" aria-hidden="true"></span></a></li>
 						</ul>
 					{% else %}	
-							<li><a href='/student/{{ session['user_id'] }}/assignments'>Assignments</a></li>
-							<li><a href='/profile/{{ session['user_id'] }}'>Account</a></li>
-							<li><a href="/logout">Logout</a></li>
+							<li><a href='/student/{{ session['user_id'] }}/assignments' title='Assignments'><span class="fa fa-list-alt fa-2x" aria-hidden="true"></span></a></li>
+							<li><a href='/profile/{{ session['user_id'] }}' title='Account'><span class="fa fa-cog fa-2x" aria-hidden="true"></span></a></li>
+							<li><a href="/logout" title="Log Out"><span class="fa fa-sign-out fa-2x" aria-hidden="true"></span></a></li>
 						</ul>
 					{% endif %}
 				{% else %}
-					<li><a href="/login">Login</a></li>
-					<li><a href="/register">Register</a></li>
+					<li><a href="#login">Login</a></li>
+					<li><a href="#register">Register</a></li>
 					</ul>
 				{% endif %}
 	        </div><!--/.nav-collapse -->
@@ -230,7 +233,7 @@
 	   </div><!-- close row -->
       </div><!-- close container -->
     </nav><!-- close nav -->
-    <div class="container-fluid" style="margin-top: 50px;">
+    <div class="container-fluid" style="margin-top: 50px;" id="login">
       <div class="row top">
       	<div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 col-xs-offset-0'>
 

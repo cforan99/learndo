@@ -75,14 +75,15 @@ def access_profile(user_id):
 
     teachers = list_teachers(user_id)
 
-    if session['user_id'] == user_id:
+    if session.get('user_id') == user_id:
         return True
     else:
         for teacher_id in teachers:
-            if session['user_id'] == teacher_id:
+            if session.get('user_id') == teacher_id:
                 return True
             else:
                 return False
+
 
 def find_class_by_task(task_id):
     """Finds class name given the task id so it can be displayed on the task page"""
