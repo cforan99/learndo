@@ -1,0 +1,149 @@
+    body {
+    	font-family: 'Lato', 'Verdana', sans-serif;
+    	margin-top: 58px;
+        font-size: 1.6em;
+    }
+
+    .center-col {
+    	width: 330px;
+    	margin: 0 auto;
+    }
+
+    .navbar-brand {
+    	padding: 10px 15px;
+    }
+
+    .navbar-inverse {
+    	min-height: 60px;
+	}
+
+    .content {
+        display:none;
+        padding: 10px;
+        width: 360px;
+    }
+    #flash {
+    	display:none;
+    }
+    a, a:hover {
+    	color: #563d99;
+    }
+
+    
+    a:active {
+    	color: #8872b2;
+    }
+
+    a:visited {
+        color: #60517e;
+    }
+
+    .completed{
+    	background-color: #abe765;
+    }
+    .completed .info {
+    	border-color: #94c658;
+    }
+    .overdue{
+    	background-color: #ffcb57;
+    }
+    .overdue .info{
+    	border-color: #ffa945;
+    }
+    .viewed{
+    	background-color: #fffc92;
+    }
+    .viewed .info{
+    	border-color: #ffeb6d;
+    }
+    .inactive{
+    	background-color: #82ecf7;
+    }
+    .inactive .info{
+    	border-color: #79d3dc;
+    }
+    .info{
+    	background-color: #fff;
+    	border-radius: 100px;
+    	border-left: 20px solid;
+    	border-right: 20px solid;
+    	padding: 0px 70px 0px 70px;
+    }
+
+    .details {
+        background-color: #fff;
+        border-radius: 100px;
+        border-left: 20px solid;
+        border-right: 20px solid;
+        padding: 10px 40px 20px 40px;
+        border-color: #94c658;
+    }
+
+    .heading{
+    	text-align: center;
+    }
+
+    #buttons{
+    	margin: 0 auto;
+    }
+
+    .cover .panel {
+    	width: 300px;
+    	margin: auto auto;
+    }
+
+    .panel h3 {
+        margin-top: 0px;
+    }
+
+    .text-vertical-center h1 {
+        margin: 0;
+        padding: 0;
+        font-size: 4.5em;
+        font-weight: 700;
+    }
+
+	/*
+     * Cover
+     */
+
+    .cover {
+      padding: 0 20px;
+    }
+    .cover .btn-lg {
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+
+    /* Extra markup and styles for table-esque vertical and horizontal centering */
+    .site-wrapper {
+      display: table;
+      width: 100%;
+      height: 100%; /* For at least Firefox */
+      min-height: 100%;
+      text-align: center;
+    }
+    .site-wrapper-inner {
+      display: table-cell;
+      vertical-align: top;
+    }
+    .cover-container {
+      margin-right: auto;
+      margin-left: auto;
+      background: url('/static/pencils.jpg') no-repeat top center scroll;
+      background-size: cover;
+    }
+
+    /* Padding for spacing */
+    .inner {
+      padding: 30px;
+    }
+
+    /* Box shadow
+       .top{
+        	-webkit-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+        	-moz-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+        	box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+        	background-color: #fff;
+        }
+    */
