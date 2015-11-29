@@ -84,38 +84,38 @@ def access_profile(user_id):
             else:
                 return False
 
+## No longer needed after restructing data model
+# def find_class_by_task(task_id):
+#     """Finds class name given the task id so it can be displayed on the task page"""
 
-def find_class_by_task(task_id):
-    """Finds class name given the task id so it can be displayed on the task page"""
+#     task = Task.query.get(task_id)
 
-    task = Task.query.get(task_id)
+#     teacher_id = task.created_by
+#     teacher = User.query.get(teacher_id)
+#     list_of_classes = teacher.classes 
 
-    teacher_id = task.created_by
-    teacher = User.query.get(teacher_id)
-    list_of_classes = teacher.classes 
+#     class_dictionary = {}  # key = class_id, value1 = class_name, value2 = student_ids_list
 
-    class_dictionary = {}  # key = class_id, value1 = class_name, value2 = student_ids_list
+#     for c in list_of_classes:
+#         class_dictionary[c.class_id] = { 'name' : c.class_name, 'users' : [] }
+#         for user in c.users:
+#             class_dictionary[c.class_id]['users'].append(user.user_id)
+#         class_dictionary[c.class_id]['users'].sort()
 
-    for c in list_of_classes:
-        class_dictionary[c.class_id] = { 'name' : c.class_name, 'users' : [] }
-        for user in c.users:
-            class_dictionary[c.class_id]['users'].append(user.user_id)
-        class_dictionary[c.class_id]['users'].sort()
+#     assignment_list = Assignment.query.filter(Assignment.task_id == task_id).all()
 
-    assignment_list = Assignment.query.filter(Assignment.task_id == task_id).all()
+#     assigned_users = []
 
-    assigned_users = []
+#     for assignment in assignment_list:
+#         assigned_users.append(assignment.student_id)
 
-    for assignment in assignment_list:
-        assigned_users.append(assignment.student_id)
+#     assigned_users.sort()
 
-    assigned_users.sort()
+#     for c in class_dictionary:
+#         if class_dictionary[c]['users'] == assigned_users:
+#             assigned_class = class_dictionary[c]['name']
 
-    for c in class_dictionary:
-        if class_dictionary[c]['users'] == assigned_users:
-            assigned_class = class_dictionary[c]['name']
-
-    return assigned_class
+#     return assigned_class
 
 
 def report_student_progress(task, assignment_list):
@@ -196,7 +196,7 @@ def create_assignment_list(assignments_list):
                 to_add['title'] = task.title
                 to_add['goal'] = task.goal
                 to_add['due_date'] = task.due_date.strftime("%A %m/%d/%y %I:%M %p")
-                to_add['assigned_to'] = find_class_by_task(task.task_id)
+                to_add['assigned_to'] = task.assigned_class.class_name
                 to_add['assigned_on'] = assignment.assigned.strftime("%A %m/%d/%y %I:%M %p")
                 to_add['status'] = check_class_status(assignment)
 

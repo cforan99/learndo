@@ -508,7 +508,7 @@ def view_assignment(teacher_id, task_id):
     assignment_list = Assignment.query.filter(Assignment.task_id == task_id).order_by(Assignment.student_id.desc()).all()
 
     if assignment_list:
-        class_name = find_class_by_task(task_id) # Queries db (a lot) to find the name of the class it is assigned to
+        class_name = task.assigned_to # Queries db (a lot) to find the name of the class it is assigned to
         assigned_on = assignment_list[0].assigned.strftime("%A %m/%d/%y %I:%M %p") # Stores date assigned
         progress = report_student_progress(task, assignment_list) # Generates a dictionary with student progress
 
@@ -646,6 +646,7 @@ def assign_to_class():
     task = Task.query.get(task_id)
     this_class = Class.query.get(class_id)
     class_list = this_class.users
+    task.assigned_to = class_id
 
     if session.get('user_id') == task.created_by:
         for user in class_list:
@@ -700,7 +701,7 @@ def assign_to_class():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    
+
     connect_to_db(app)
 
     # Use the DebugToolbar

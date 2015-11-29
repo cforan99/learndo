@@ -15,7 +15,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     is_teacher = db.Column(db.Boolean, nullable=False)
-    username = db.Column(db.Integer, nullable=False, unique=True)
+    username = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(16), nullable=False)
     email = db.Column(db.String(64), nullable=True)
     first_name = db.Column(db.String(32), nullable=False)
@@ -70,11 +70,12 @@ class Task(db.Model):
     title = db.Column(db.String(128), nullable=False)
     goal = db.Column(db.String(712), nullable=False)
     directions = db.Column(db.String(712), nullable=False)
-    link = db.Column(db.String(256), nullable=False)
-    points = db.Column(db.Integer)
+    link = db.Column(db.String(256))
     due_date = db.Column(db.DateTime)
+    assigned_to = db.Column(db.Integer, db.ForeignKey('classes.class_id'))
 
     assignments = db.relationship('Assignment', backref='task')
+    assigned_class = db.relationship('Class', backref='tasks')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -93,42 +94,11 @@ class Assignment(db.Model):
     assigned = db.Column(db.DateTime)
     viewed = db.Column(db.DateTime)
     completed = db.Column(db.DateTime)
-    received = db.Column(db.DateTime)
-    graded_at = db.Column(db.DateTime)
-    points_earned = db.Column(db.Float)
-
-    messages = db.relationship('Message', backref='assignment')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Assignment assign_id=%d task_id=%d student_id=%s>" % (self.assign_id, self.task_id, self.student_id)
-
-
-class Message(db.Model):
-    """How teachers and students communicate about an assignment"""
-
-    __tablename__ = "messages"
-
-    message_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    sent_from = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    sent_to = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    assign_id = db.Column(db.Integer, db.ForeignKey('assignments.assign_id'))
-    message = db.Column(db.Text, nullable=False)
-    sent_at = db.Column(db.DateTime)
-    read_at = db.Column(db.DateTime)
-
-    sender = db.relationship('User', primaryjoin='Message.sent_from==User.user_id', 
-                                     backref='messages_sent')
-    recipient = db.relationship('User', primaryjoin='Message.sent_to==User.user_id',
-                                        backref='messages_received')
-
-    def __repr__(self):
-        """Provide helpful representation when printed."""
-
-        return "<Message message_id=%d assign_id=%d sent_from=%d sent_to=%s>" % (self.message_id, 
-            self.assign_id, self.sent_from, self.sent_to)
-
 
 
 ##############################################################################
@@ -138,7 +108,8 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///learndo.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/learndo'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
