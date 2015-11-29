@@ -1,5 +1,7 @@
 """Learndo: An assignment tracker/notification system"""
 
+import os
+
 from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request, flash, redirect, session, jsonify, json
