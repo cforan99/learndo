@@ -27,7 +27,7 @@
 
 	// Get intitial assignment list
     $(document).ready(function() {
-        $.get("http://localhost:5000/list.json", setCurrentData);
+        $.get("/list.json", setCurrentData);
     });
 
 
@@ -147,7 +147,7 @@
 	  if ($("#newest").hasClass("active")) {
 		setTimeout(function(){
 		  // AJAX request 
-		  $.get("http://localhost:5000/list.json", function(data){
+		  $.get("/list.json", function(data){
 
 		  	var newestData = data.list;
 		  	newestDataIds = listAssignmentIds(newestData)

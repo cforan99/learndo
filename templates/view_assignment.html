@@ -91,7 +91,7 @@ var className = "{{ class_name }}";
 	  if (className !== "None") {
 		setTimeout(function(){
 		  // AJAX request 
-		  $.get("http://localhost:5000/progress/"+taskId+".json", function(data){
+		  $.get("/progress/"+taskId+".json", function(data){
 		  	
 		  	if (data !== "None") {
 

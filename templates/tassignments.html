@@ -17,7 +17,7 @@
 <div class="heading"><h2>My assignments</h2>
 </div>
 </div></div></div>
-<div class='assignments container-fluid'></div>
+<div class='assignments container-fluid'>Testing</div>
 {% endblock %}
 
 {% block js %}
@@ -25,7 +25,7 @@
 	var tid = "{{ tid }}";
 
     $(document).ready(function() {
-        $.get("http://localhost:5000/list.json", setCurrentData);
+        $.get("/list.json", setCurrentData);
     });
 
     $( ".btn" ).click(function() {
@@ -41,7 +41,7 @@
 
 	function setCurrentData(data) {
 		currentData = data.list;
-		filterData(currentData, 'show-all', 'newest');
+		filterData(currentData);
 	}
 
 
@@ -92,16 +92,16 @@
     // Generate list of assignments ordered by newest
 	function generateList(assignmentList) {
 
-		console.log(assignmentList);
+		// console.log(assignmentList);
 
 		$(".assignments").empty();
 
-		if (assignmentList.length == 0) {
+		if (assignmentList.length === 0) {
 				$(".assignments").prepend("<p class='text-center'>No tasks to display.</p>");
 
 		} else {
-			for (assignment in assignmentList) {
-			a = assignmentList[assignment];
+			for (var assignment in assignmentList) {
+			var a = assignmentList[assignment];
 	
 			$(".assignments").prepend(
 

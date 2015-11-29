@@ -9,7 +9,6 @@
 
     <!-- Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-    <link href='//fonts.googleapis.com/css?family=Signika:400,300,600,700' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
@@ -23,7 +22,7 @@
     <style>
 
     body {
-    	font-family: "Lato", "Verdana", sans-serif;
+    	font-family: 'Lato', 'Verdana', sans-serif;
     	margin-top: 58px;
         font-size: 1.6em;
     }
@@ -135,66 +134,81 @@
     .panel h3 {
         margin-top: 0px;
     }
-}
 
-.text-vertical-center h1 {
-    margin: 0;
-    padding: 0;
-    font-size: 4.5em;
-    font-weight: 700;
-}
-}
-
-/*
- * Cover
- */
-
-.cover {
-  padding: 0 20px;
-}
-.cover .btn-lg {
-  padding: 10px 20px;
-  font-weight: bold;
-}
-
-/* Extra markup and styles for table-esque vertical and horizontal centering */
-.site-wrapper {
-  display: table;
-  width: 100%;
-  height: 100%; /* For at least Firefox */
-  min-height: 100%;
-  text-align: center;
-}
-.site-wrapper-inner {
-  display: table-cell;
-  vertical-align: top;
-}
-.cover-container {
-  margin-right: auto;
-  margin-left: auto;
-  background: url(http://localhost:5000/static/pencils.jpg) no-repeat top center scroll;
-  background-size: cover;
-}
-
-/* Padding for spacing */
-.inner {
-  padding: 30px;
-}
-
-/*    .top{
-    	-webkit-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
-    	-moz-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
-    	box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
-    	background-color: #fff;
+    .text-vertical-center h1 {
+        margin: 0;
+        padding: 0;
+        font-size: 4.5em;
+        font-weight: 700;
     }
-*/
+
+    /* Disable navbar collapse */
+/*    .navbar-collapse.collapse {
+    display: block!important;
+    }
+
+    .navbar-nav>li, .navbar-nav {
+    float: left !important;
+    }
+
+
+    .navbar-nav.navbar-right:last-child {
+    margin-right: -15px !important;
+    }
+
+    .navbar-right {
+    float: right!important;
+    }
+*/    /*
+     * Cover
+     */
+
+    .cover {
+      padding: 0 20px;
+    }
+    .cover .btn-lg {
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+
+    /* Extra markup and styles for table-esque vertical and horizontal centering */
+    .site-wrapper {
+      display: table;
+      width: 100%;
+      height: 100%; /* For at least Firefox */
+      min-height: 100%;
+      text-align: center;
+    }
+    .site-wrapper-inner {
+      display: table-cell;
+      vertical-align: top;
+    }
+    .cover-container {
+      margin-right: auto;
+      margin-left: auto;
+      background: url('/static/pencils.jpg') no-repeat top center scroll;
+      background-size: cover;
+    }
+
+    /* Padding for spacing */
+    .inner {
+      padding: 30px;
+    }
+
+    /*    .top{
+        	-webkit-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+        	-moz-box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+        	box-shadow: inset -7px -4px 74px -16px rgba(204,204,204,1);
+        	background-color: #fff;
+        }
+    */
     </style>
 
 </head>
 <body>
 
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container-fluid">
       	<div class="row">
 	      <div class='col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 col-xs-offset-0'>
