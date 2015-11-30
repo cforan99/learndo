@@ -23,7 +23,7 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage with registration form and login link"""
 
-    if session.get('user_id'):
+    if session.get('user_id') != None:
         url = "/"+session['acct_type']+"/"+str(session['user_id'])+"/assignments"
         return redirect(url)
     else:
@@ -43,7 +43,7 @@ def register_process():
     username = request.form.get("username")
     password = request.form.get("password")
     school = request.form.get("school")
-    teacher = request.form.get("teacher")
+    teacher = bool(request.form.get("teacher"))
 
     # Check to see if username is available
     if len(User.query.filter(User.username == username).all()) > 0:
@@ -89,10 +89,10 @@ def login_process():
     user = User.query.filter_by(username=username).first()
     if not user:
         flash("No such user")
-        return redirect("/login")
+        return redirect("/")
     if user.password != password:
         flash("Incorrect password")
-        return redirect("/login")
+        return redirect("/")
 
     # Save user id and account type in session
     session["user_id"] = user.user_id
@@ -263,7 +263,7 @@ def create_student():
         teacher = User.query.get(teacher_id)
 
         # Creates new user in db
-        new_student = User(is_teacher=0,
+        new_student = User(is_teacher=False,
                            username=username,
                            password=password,
                            email=email,
@@ -271,10 +271,9 @@ def create_student():
                            last_name=last,
                            display_name=preferred,
                            school=teacher.school)
-
-        new_student.classes.append(Class.query.get(class_id))
         db.session.add(new_student)
         db.session.commit()
+        new_student.classes.append(Class.query.get(class_id))
         
         flash("A new account has been created for {} with the username {} and password {}.".format(preferred, username, password))
         return redirect('/teacher/{}/classes'.format(teacher_id))
@@ -508,7 +507,7 @@ def view_assignment(teacher_id, task_id):
     assignment_list = Assignment.query.filter(Assignment.task_id == task_id).order_by(Assignment.student_id.desc()).all()
 
     if assignment_list:
-        class_name = task.assigned_to # Queries db (a lot) to find the name of the class it is assigned to
+        class_name = task.assigned_class.class_name # Queries db (a lot) to find the name of the class it is assigned to
         assigned_on = assignment_list[0].assigned.strftime("%A %m/%d/%y %I:%M %p") # Stores date assigned
         progress = report_student_progress(task, assignment_list) # Generates a dictionary with student progress
 
@@ -663,39 +662,6 @@ def assign_to_class():
     else:
         flash("You are not authorized to make this change.")
         return redirect("/")
-
-
-
-# #THIS WORKS BUT I WILL NOT USE IT UNTIL START ANGULAR
-# @app.route('/profile/<int:user_id>.json')
-# def view_profile(user_id):
-#     """Returns JSON object of user info from db to display on profile page"""
-
-#     user = User.query.get(user_id)
-
-#     if user.is_teacher:
-#         acct_type = 'teacher'
-#     else:
-#         acct_type = 'student'
-
-#     my_classes = []
-#     for each_class in user.classes:
-#         my_classes.append(each_class.class_name)
-
-#     profile_info = {
-#         'first' : user.first_name,
-#         'last' : user.last_name,
-#         'preferred' : user.display_name,
-#         'email' : user.email,
-#         'username' : user.username,
-#         'password' : user.password,
-#         'school' : user.school,
-#         'classes' : my_classes
-#     }
-
-#     if access_profile(user_id) == True:
-#         return jsonify(profile_info)
-
 
 
 if __name__ == "__main__":

@@ -117,8 +117,6 @@
 
                     <li id="c{{ class_id }}"><b>{{ class_list[class_id]['class_name'] }}</b>  &nbsp; 
                     <button data-classid="{{ class_id }}" class="btn btn-default btn-xs delete_class" data-toggle="modal" data-target="#confirmDelete"><span class="fa fa-close" aria-hidden="true"></span></button>
-                    </li>
-
                     {% if 'students' in class_list[class_id] %}
                         <ul id="class{{ class_id }}">
                             {% for student in class_list[class_id]['students'] %}
@@ -130,6 +128,7 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
+                    </li>
                 {% endfor %}
                 </ul>
                 <br>

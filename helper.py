@@ -5,9 +5,12 @@ def add_class(teacher, class_name):
     """Create a new class in db and add the teacher to the class"""
 
     new_class = Class(class_name=class_name)                
-    new_class.users.append(teacher)
     db.session.add(new_class)
     db.session.commit()
+    new_class.users.append(teacher)
+    db.session.commit()
+
+    return new_class.class_id
 
 
 def show_classes(teacher):
