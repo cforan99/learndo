@@ -79,8 +79,13 @@ class Task(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-
         return "<Task task_id=%r title=%s created_by=%s>" % (self.task_id, self.title, self.created_by)
+
+    def unassign(self, task_id):
+        task = Task.query.get(task_id)
+        for a in task.assignments:
+            db.session.delete(a)
+            db.session.commit()
 
 
 class Assignment(db.Model):

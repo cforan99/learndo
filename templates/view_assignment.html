@@ -2,12 +2,17 @@
 {% block content %}
 
 <h2>{{ task.title }} &nbsp; <span class="pull-right"><button onclick="location.href='/teacher/{{ task.created_by }}/assignments/{{ task.task_id }}/edit'" class="btn">edit</button></span></h2> 
-<h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
+{% if class_name != None %}
+	<h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
+{% else %}
+	<h4><i>Not yet assigned</i></h4>
+{% endif %}
 
-<div class="student-progress">
-<h3>Student Progress</h3>
+<h3 class="text-center">Student Progress</h3>
   <div class="assign">
 	  {% if class_name != None %}
+	  {% if progress %}
+	  <div class="student-progress">
 	  	<table class="table table-condensed list-progress props xmpl" id="xtable">
 	  		<thead>
 	  			<tr><th>Student Name</th>
@@ -16,52 +21,55 @@
 	  			</tr>
 	  		</thead>
 	  		<tbody>
-
-	  		{% for s in progress %}
-	  			<tr id="{{ s }}"><td class="name">{{ progress[s]['first'] }} {{ progress[s]['last'] }}</td>
-	  			{% if progress[s]['completed'] %}
-	  				<td class="completed">Done</td>
-	  				<td class="timestamp">Completed: {{ progress[s]['completed'] }}</td>
-	  				</tr>
-	  			{% elif progress[s]['overdue'] %}
-	  				<td class="overdue">Overdue</td>
-	  				{% if progress[s]['viewed'] %}
-	  					<td class="timestamp">Last Viewed: {{ progress[s]['viewed'] }}</td>
-	  				{% else %}
-	  					<td class="timestamp">Not yet viewed</td>
-	  					</tr>
-	  				{% endif %}
-	  			{% elif progress[s]['viewed'] %}
-	  				<td class="viewed">In progress</td>
-	  				<td class="timestamp">Last Viewed: {{ progress[s]['viewed'] }}</td>
-	  				</tr>
-	  			{% else %}
-	  				<td class="inactive">Not viewed</td>
-	  				<td class="timestamp">Assigned on: {{ progress[s]['assigned'] }}</td>
-	  				</tr>
-	  			{% endif%}
-	  		{% endfor %}
-
+		  		{% for s in progress %}
+		  			<tr id="{{ s }}"><td class="name">{{ progress[s]['first'] }} {{ progress[s]['last'] }}</td>
+		  			{% if progress[s]['completed'] %}
+		  				<td class="completed">Done</td>
+		  				<td class="timestamp">Completed: {{ progress[s]['completed'] }}</td>
+		  				</tr>
+		  			{% elif progress[s]['overdue'] %}
+		  				<td class="overdue">Overdue</td>
+		  				{% if progress[s]['viewed'] %}
+		  					<td class="timestamp">Last Viewed: {{ progress[s]['viewed'] }}</td>
+		  				{% else %}
+		  					<td class="timestamp">Not yet viewed</td>
+		  					</tr>
+		  				{% endif %}
+		  			{% elif progress[s]['viewed'] %}
+		  				<td class="viewed">In progress</td>
+		  				<td class="timestamp">Last Viewed: {{ progress[s]['viewed'] }}</td>
+		  				</tr>
+		  			{% else %}
+		  				<td class="inactive">Not viewed</td>
+		  				<td class="timestamp">Assigned on: {{ progress[s]['assigned'] }}</td>
+		  				</tr>
+		  			{% endif%}
+		  		{% endfor %}
 	  		</tbody>
 	  	</table>	
+	  </div>
+	  {% else %}
+	  <h4 class="text-center"><i>No students in this class.</i></h4>
+	  {% endif %}
 
 	  {% else %}
-		<p>This has not yet been assign. Select a class to assign.</p>
-		    <div class="assign_status">
-		        <form action="/assign" method="POST">
-				    <select name="class-id">
+	  <div class="student-progress center-col text-center panel panel-default panel-body">
+		<p>Select a class to assign.</p>
+	        <form action="/assign" method="POST">
+	        	<div class="form-group form-inline">
+				    <select name="class-id" class="form-control">
 				      {% for class_id in class_list.keys() %}
 				      <option value="{{ class_id }}">{{ class_list[class_id]['class_name'] }}</option>
 				      {% endfor %}
-				    </select>
+				    </select> &nbsp; 
 				    <input type="hidden" name="task_id" value="{{ task.task_id }}">
-				    <input type="submit" value="Assign">
-				</form>
-		    </div>
+				    <input type="submit" class="btn btn-info" value="Assign">
+			    </div>
+			</form>
+	   </div>
 	  {% endif %}
 	</div>
-</div>
-<br>
+<br><br>
 
 <div class="assignment details">
 	<h3>Learning goal:</h3>

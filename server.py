@@ -510,13 +510,15 @@ def view_assignment(teacher_id, task_id):
         class_name = task.assigned_class.class_name # Queries db (a lot) to find the name of the class it is assigned to
         assigned_on = assignment_list[0].assigned.strftime("%A %m/%d/%y %I:%M %p") # Stores date assigned
         progress = report_student_progress(task, assignment_list) # Generates a dictionary with student progress
+        status = check_class_status(assignment_list[0])
 
     else:
         assigned_on = None
         class_name = None
         progress = None
+        status = 'inactive'
 
-    status = check_class_status(assignment_list[0])
+    
 
     # double-checks authorization before rendering template
     user_id = session['user_id']
@@ -604,12 +606,8 @@ def edit_assignment():
     hour = request.form.get("hour")
     minute = request.form.get("minute")
     ampm = request.form.get("ampm")
-    points = int(request.form.get("points"))
     teacher_id = int(request.form.get("teacher_id"))
     task_id = int(request.form.get("task_id"))
-
-    if points == "":
-        points = None
 
     date_string = "{}/{}/{} {}:{} {}".format(month, day, year, hour, minute, ampm)
     due_date = datetime.strptime(date_string, "%m/%d/%y %I:%M %p")
@@ -622,7 +620,6 @@ def edit_assignment():
         task.goal = goal
         task.directions = directions
         task.link = link
-        task.points = points
         task.due_date = due_date
 
         db.session.commit()

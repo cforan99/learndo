@@ -239,6 +239,7 @@ def check_student_status(assignment):
 def check_class_status(assignment):
     """Checks assignment object for status as viewed, completed, or overdue."""
 
+    status = 'inactive'
     if assignment.assigned: 
         student_assignments = Assignment.query.filter(Assignment.task_id == assignment.task_id).all()
         for assignment in student_assignments:
@@ -252,7 +253,5 @@ def check_class_status(assignment):
                         break
                 elif assignment.completed:
                     status = 'completed'
-    else:
-        status = 'inactive'
 
     return status
