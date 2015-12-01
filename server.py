@@ -274,6 +274,7 @@ def create_student():
         db.session.add(new_student)
         db.session.commit()
         new_student.classes.append(Class.query.get(class_id))
+        db.session.commit()
         
         flash("A new account has been created for {} with the username {} and password {}.".format(preferred, username, password))
         return redirect('/teacher/{}/classes'.format(teacher_id))

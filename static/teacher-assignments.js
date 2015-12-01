@@ -44,10 +44,10 @@ function sortData(data) {
 
 	if (sort === 'newest') {
 		data.sort(function (a, b) {
-		  if (a.ad < b.ad) {
+		  if (a.ad > b.ad) {
 		    return 1;
 		  }
-		  if (a.ad > b.ad) {
+		  if (a.ad < b.ad) {
 		    return -1;
 		  }
 		  // a must be equal to b

@@ -84,8 +84,7 @@ def access_profile(user_id):
         for teacher_id in teachers:
             if session.get('user_id') == teacher_id:
                 return True
-            else:
-                return False
+        return False
 
 ## No longer needed after restructing data model
 # def find_class_by_task(task_id):
@@ -208,8 +207,8 @@ def create_assignment_list(assignments_list):
             else:
                 to_add['id'] = task.task_id
                 to_add['ad'] = 2000000000 + task.task_id
-                dd = (assignment.task.due_date - datetime(1970,1,1)).total_seconds()
-                to_add['dd'] = dd + float("."+str(assignment.task_id))
+                dd = (task.due_date - datetime(1970,1,1)).total_seconds()
+                to_add['dd'] = dd + float("."+str(task.task_id))
                 to_add['title'] = task.title
                 to_add['goal'] = task.goal
                 to_add['due_date'] = task.due_date.strftime("%A %m/%d/%y %I:%M %p")

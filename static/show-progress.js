@@ -20,7 +20,7 @@
 				if (a.completed !== null) {
 					$("#"+s).append("<td class='completed'>Done</td>\
 		  				<td class='timestamp'>Completed: "+a.completed+"</td>");
-				} else if (a.overdue !== null) {
+				} else if (a.overdue) {
 					$("#"+s).append("<td class='overdue'>Overdue</td>");
 					if (a.viewed !== null) {
 						$("#"+s).append("<td class='timestamp'>Last Viewed: "+a.viewed+"</td>");

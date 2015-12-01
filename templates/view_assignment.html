@@ -3,11 +3,13 @@
 
 <h2>{{ task.title }} &nbsp; <span class="pull-right"><button onclick="location.href='/teacher/{{ task.created_by }}/assignments/{{ task.task_id }}/edit'" class="btn">edit</button></span></h2> 
 {% if class_name != None %}
-	<h4>Assigned to <b>{{ class_name }}</b> on {{ assigned_on }}</h4>
+	<h4>Assigned to <i>{{ class_name }}</i> on {{ assigned_on }}</h4>
+	<h4><b>Due date: {{ due_date }}</b></h4><br>
 {% else %}
 	<h4><i>Not yet assigned</i></h4>
+	<h4><b>Due date: {{ due_date }}</b></h4>
 {% endif %}
-
+	
 <h3 class="text-center">Student Progress</h3>
   <div class="assign">
 	  {% if class_name != None %}
@@ -69,7 +71,7 @@
 	   </div>
 	  {% endif %}
 	</div>
-<br><br>
+<br>
 
 <div class="assignment details">
 	<h3>Learning goal:</h3>
@@ -80,8 +82,7 @@
 
 	<h3>Link to resource:</h3>
 	<a href="{{ task.link }}" target="_blank">{{ task.link }}</a>
-
-	<h3>Due date: {{ due_date }}</h3>
+	<br><br>
 </div>
 <br><br>
 

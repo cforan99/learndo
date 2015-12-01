@@ -6,14 +6,14 @@
 <div class="assignment">
 
 	<div class="checkbox alert alert-success">
-		<form action="/completed" method="POST" class="form form-inline">
-			<div class="form-group">
+		<form action="/completed" method="POST" class="form">
+			<div>
 			<label>
 			<input type="checkbox" name="completed" class="complete">
-			I have finished this assignment! 
-			<input type="hidden" name="assign_id" value="{{ assignment.assign_id }}">
+			I have finished this assignment!
 			</label>
 			</div>
+			<input type="hidden" name="assign_id" value="{{ assignment.assign_id }}">
 		</form>
 	</div>
 	

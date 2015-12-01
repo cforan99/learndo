@@ -81,7 +81,8 @@ class Task(db.Model):
         """Provide helpful representation when printed."""
         return "<Task task_id=%r title=%s created_by=%s>" % (self.task_id, self.title, self.created_by)
 
-    def unassign(self, task_id):
+    @staticmethod
+    def unassign(task_id):
         task = Task.query.get(task_id)
         for a in task.assignments:
             db.session.delete(a)
@@ -102,9 +103,15 @@ class Assignment(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-
         return "<Assignment assign_id=%d task_id=%d student_id=%s>" % (self.assign_id, self.task_id, self.student_id)
 
+    @staticmethod
+    def unview(task_id, student_id):
+        a = Assignment.query.filter(Assignment.task_id == task_id, Assignment.student_id == student_id).one()
+        a.viewed = None
+        a.completed = None
+        db.session.commit()
+        
 
 ##############################################################################
 # Helper functions
