@@ -1,5 +1,6 @@
 """Models and database functions for project"""
 
+import os
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -120,7 +121,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/learndo'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "postgresql:///learndo")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     # app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
@@ -141,5 +142,5 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     from server import app
-    connect_to_db(app)
+    connect_to_db(app, os.environ.get("DATABASE_URL", "postgresql:///learndo"))
     print "Connected to DB."
